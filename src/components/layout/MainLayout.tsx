@@ -27,10 +27,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { name: 'Users', path: '/users', icon: <UsersIcon className="h-5 w-5" /> },
     { name: 'Analytics', path: '/analytics', icon: <ChartBarIcon className="h-5 w-5" /> },
     { name: 'Integrations', path: '/integrations', icon: <PuzzleIcon className="h-5 w-5" /> },
-    { name: 'AI', path: '/ai', icon: <BrainIcon className="h-5 w-5" /> },
+    { name: 'AI Assistant', path: '/ai', icon: <BrainIcon className="h-5 w-5" /> },
     { name: 'Web3', path: '/web3', icon: <CubeIcon className="h-5 w-5" /> },
     { name: 'Settings', path: '/settings', icon: <CogIcon className="h-5 w-5" /> },
-    { name: 'AI Assistant', path: '/ai', icon: <BrainIcon className="h-5 w-5" /> }
   ];
 
   const toggleSidebar = () => {
