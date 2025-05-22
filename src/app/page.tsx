@@ -1,5 +1,5 @@
-import HomeClient from "./pageClient";
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return <HomeClient />;
+  redirect('/dashboard');
 }
