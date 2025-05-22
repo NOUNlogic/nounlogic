@@ -13,6 +13,16 @@ const InstitutionsClient = () => {
   // Mock institutions data
   const institutions = [
     {
+      id: '0',
+      name: 'National Open University of Nigeria',
+      type: 'university',
+      location: 'Nigeria',
+      courses: 120,
+      students: 50000,
+      logo: '/noun-logo.png', // Replace with actual logo path if available
+      featured: true,
+    },
+    {
       id: '1',
       name: 'Blockchain Academy',
       type: 'academy',
