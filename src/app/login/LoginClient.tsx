@@ -11,7 +11,7 @@ import { AlertCircle, Mail, Lock, ArrowRight, Wallet } from 'lucide-react';
 
 const LoginClient = () => {
   const router = useRouter();
-  const { login, loginWithWallet, isLoading: authLoading } = useAuth();
+  const { login, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'email' | 'wallet'>('email');
   const [email, setEmail] = useState('');
@@ -30,39 +30,24 @@ const LoginClient = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (loginMethod === 'email') {
       if (!email || !password) {
         setError('Please enter both email and password');
         return;
       }
-      
       setIsLoading(true);
       setError('');
-      
       try {
         await login(email, password);
         router.push('/dashboard');
-      } catch (err) {
-        setError('Invalid email or password');
+      } catch (err: any) {
+        setError(err?.message || 'Invalid email or password');
       } finally {
         setIsLoading(false);
       }
     } else {
-      // Handle wallet connection
-      try {
-        setIsLoading(true);
-        
-        // Mock wallet address for demo
-        const mockWalletAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
-        await loginWithWallet(mockWalletAddress);
-        
-        router.push('/dashboard');
-      } catch (err) {
-        setError('Failed to connect wallet');
-      } finally {
-        setIsLoading(false);
-      }
+      // Optionally handle wallet login here
+      setError('Wallet login is not implemented.');
     }
   };
 

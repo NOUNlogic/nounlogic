@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/CardComponents';
 import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/app/providers';
 
 const RegisterClient = () => {
   const router = useRouter();
@@ -14,6 +15,7 @@ const RegisterClient = () => {
   const [registerMethod, setRegisterMethod] = useState<'email' | 'wallet'>('email');
   const [formStep, setFormStep] = useState(1);
   const [formAnimation, setFormAnimation] = useState(false);
+  const { register } = useAuth();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -126,14 +128,11 @@ const RegisterClient = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Registration successful
-      router.push('/login?registered=true');
-    } catch (error) {
+      await register(formData.name, formData.email, formData.password);
+      router.push('/dashboard');
+    } catch (error: any) {
       setErrors({
-        form: 'Registration failed. Please try again.'
+        form: error?.message || 'Registration failed. Please try again.'
       });
     } finally {
       setIsLoading(false);
