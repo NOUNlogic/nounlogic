@@ -14,6 +14,7 @@ const CoursesClient = () => {
   const courses = [
     {
       id: '1',
+      courseId: '1',
       title: 'Introduction to Web3',
       description: 'Learn the fundamentals of blockchain, cryptocurrencies, and decentralized applications.',
       instructor: 'Jane Doe',
@@ -28,6 +29,7 @@ const CoursesClient = () => {
     },
     {
       id: '2',
+      courseId: '2',
       title: 'Machine Learning Fundamentals',
       description: 'Explore the core concepts of machine learning and artificial intelligence.',
       instructor: 'John Smith',
@@ -42,6 +44,7 @@ const CoursesClient = () => {
     },
     {
       id: '3',
+      courseId: '3',
       title: 'Data Structures & Algorithms',
       description: 'Master the essential data structures and algorithms for efficient programming.',
       instructor: 'Alice Johnson',
@@ -56,6 +59,7 @@ const CoursesClient = () => {
     },
     {
       id: '4',
+      courseId: '4',
       title: 'Full Stack Web Development',
       description: 'Build modern web applications using the latest technologies and frameworks.',
       instructor: 'Bob Wilson',
@@ -70,6 +74,7 @@ const CoursesClient = () => {
     },
     {
       id: '5',
+      courseId: '5',
       title: 'Cryptocurrency Trading',
       description: 'Learn strategies for trading digital assets and managing crypto portfolios.',
       instructor: 'Sarah Miller',
@@ -84,6 +89,7 @@ const CoursesClient = () => {
     },
     {
       id: '6',
+      courseId: '6',
       title: 'Deep Learning Specialization',
       description: 'Advanced neural networks, computer vision, and natural language processing.',
       instructor: 'Michael Chen',
@@ -154,7 +160,7 @@ const CoursesClient = () => {
         {/* Courses grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map(course => (
-            <Card key={course.id} className="overflow-hidden flex flex-col">
+            <Card key={course.courseId} className="overflow-hidden flex flex-col">
               <div className="relative h-48 w-full overflow-hidden">
                 <img
                   src={course.image}

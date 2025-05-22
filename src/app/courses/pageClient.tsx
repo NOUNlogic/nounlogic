@@ -185,8 +185,8 @@ export default function CoursesClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map(course => (
             <Link 
-              href={`/courses/${course.id}`} 
-              key={course.id}
+              href={`/courses/${course.courseId}`} 
+              key={course.courseId}
               className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
             >
               <div className="h-48 overflow-hidden relative">
@@ -256,7 +256,7 @@ export default function CoursesClient() {
                 <tr 
                   key={course.id} 
                   className="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer"
-                  onClick={() => window.location.href = `/courses/${course.id}`}
+                  onClick={() => window.location.href = `/courses/${course.courseId}`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
