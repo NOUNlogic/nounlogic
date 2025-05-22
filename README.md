@@ -1,42 +1,42 @@
-# NounLogic LMS
+# NounLogic Learning Management System
 
-A robust, scalable Learning Management System built with Next.js and Appwrite.
+A modern, feature-rich Learning Management System with Web3 integration.
 
 ## Features
 
-- **Modern UI**: Clean, responsive interface built with Tailwind CSS
-- **Authentication**: Secure user authentication with email/password and social logins
+- **Modular UI Components**: Clean separation between client and page components
+- **Responsive Design**: Works seamlessly across all device sizes
+- **Web3 Integration**: Blockchain certificates and wallet connectivity
 - **Course Management**: Create, manage, and enroll in courses
-- **User Dashboard**: Track progress and manage learning
-- **Institution Support**: Multi-tenancy support for different educational institutions
-- **AI Integration**: AI-powered content recommendations 
-- **Web3 Features**: Blockchain-verified certificates and credentials (optional)
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **Institutions**: Connect with educational institutions
+- **Rich Content**: Support for various content types in lessons
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend/BaaS**: Appwrite
-- **Authentication**: Appwrite Auth
-- **Database**: Appwrite Databases
-- **Storage**: Appwrite Storage
-- **Web3** (optional): Ethereum/Polygon integration
+- **Next.js**: React framework with server components
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first CSS framework
+- **Web3 Integration**: Ethereum wallet connectivity
 
-## Getting Started
+## Project Structure
 
-### Prerequisites
-
-- Node.js 16.x or higher
-- npm or yarn
-- Appwrite instance (cloud or self-hosted)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/nounlogic.git
-   cd nounlogic
+```
+src/
+├── app/                   # Next.js app router pages
+│   ├── courses/           # Course-related pages
+│   ├── dashboard/         # Dashboard page
+│   ├── institutions/      # Institutions pages
+│   ├── login/             # Authentication pages
+│   ├── profile/           # User profile pages
+│   ├── web3/              # Web3 integration pages
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Root page
+│   └── providers.tsx      # Context providers
+│
+├── components/            # Reusable UI components
+│   ├── layout/            # Layout components
+│   │   ├── Layout.tsx     # Base layout
    ```
 
 2. Install dependencies:

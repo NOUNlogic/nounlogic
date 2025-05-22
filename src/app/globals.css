@@ -1,71 +1,96 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1f2937;
-  
-  --accent: #8b5cf6;
-  --accent-foreground: #ffffff;
-  
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  
-  --card: #ffffff;
-  --card-foreground: #171717;
-  
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+ 
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+ 
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+ 
+  --primary: 243 75% 59%;
+  --primary-foreground: 210 40% 98%;
+ 
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+ 
+  --accent: 249 90% 70%;
+  --accent-foreground: 210 40% 98%;
+ 
+  --danger: 0 84.2% 60.2%;
+  --danger-foreground: 210 40% 98%;
+ 
+  --warning: 38 92% 50%;
+  --warning-foreground: 210 40% 98%;
+ 
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+ 
+  --info: 199 89% 48%;
+  --info-foreground: 210 40% 98%;
+ 
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 243 75% 59%;
+ 
   --radius: 0.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+ 
+  --card: 222.2 84% 9.9%;
+  --card-foreground: 210 40% 98%;
+ 
+  --popover: 222.2 84% 9.9%;
+  --popover-foreground: 210 40% 98%;
+ 
+  --primary: 243 75% 59%;
+  --primary-foreground: 210 40% 98%;
+ 
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+ 
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+ 
+  --accent: 249 90% 70%;
+  --accent-foreground: 210 40% 98%;
+ 
+  --danger: 0 62.8% 60.6%;
+  --danger-foreground: 210 40% 98%;
+ 
+  --warning: 48 96% 53%;
+  --warning-foreground: 222.2 84% 4.9%;
+ 
+  --success: 142 76% 40%;
+  --success-foreground: 210 40% 98%;
+ 
+  --info: 199 89% 52%;
+  --info-foreground: 210 40% 98%;
+ 
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 243 75% 59%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-    
-    --primary: #6366f1;
-    --primary-foreground: #ffffff;
-    
-    --secondary: #1e293b;
-    --secondary-foreground: #f8fafc;
-    
-    --accent: #a78bfa;
-    --accent-foreground: #ffffff;
-    
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    
-    --card: #1e293b;
-    --card-foreground: #f8fafc;
-    
-    --border: #334155;
-    --input: #334155;
-  }
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 * {
@@ -88,4 +113,48 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.prose a {
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  text-decoration: none;
+}
+
+.prose a:hover {
+  color: hsl(var(--accent));
+  text-decoration: underline;
+}
+
+.prose ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.prose ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  list-style-type: decimal;
+  list-style-position: outside;
+}
+
+.prose h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose p {
+  margin-bottom: 0.75rem;
 }
