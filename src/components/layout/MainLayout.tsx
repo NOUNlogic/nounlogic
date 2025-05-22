@@ -67,8 +67,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </footer>
         </div>
         
-        {/* Mobile Bottom Navigation */}
-        <MobileBottomBar />
+        {/* Mobile Bottom Navigation - fixed to bottom */}
+        <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
+          <MobileBottomBar />
+        </div>
       </div>
     </Layout>
   );
