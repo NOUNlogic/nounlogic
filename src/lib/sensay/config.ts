@@ -107,3 +107,46 @@ export const TOPIC_CONFIGS = {
     description: 'Security considerations for blockchain systems'
   }
 };
+
+// Sensay API Configuration
+export const getSensayConfig = () => {
+  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
+  const apiVersion = process.env.NEXT_PUBLIC_SENSAY_API_VERSION || '2025-03-25';
+  
+  if (!apiKey || apiKey === 'your-sensay-api-key') {
+    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY in your environment variables.');
+    return null;
+  }
+
+  return {
+    BASE: 'https://api.sensay.io',
+    VERSION: apiVersion,
+    TOKEN: apiKey,
+    HEADERS: {
+      'X-ORGANIZATION-SECRET': apiKey,
+      'X-USER-ID': apiKey,
+      'X-API-Version': apiVersion,
+      'Content-Type': 'application/json'
+    },
+    WITH_CREDENTIALS: false,
+    CREDENTIALS: 'omit'
+  };
+};
+
+// Initialize Sensay API client
+export const createSensayClient = () => {
+  const config = getSensayConfig();
+  
+  if (!config) {
+    return null;
+  }
+
+  try {
+    // Import SensayAPI dynamically to avoid issues
+    const { SensayAPI } = require('./sensay-sdk/SensayAPI');
+    return new SensayAPI(config);
+  } catch (error) {
+    console.error('Failed to initialize Sensay API:', error);
+    return null;
+  }
+};

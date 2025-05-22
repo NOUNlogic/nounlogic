@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 
-interface SensayConfig {
-  apiKey: string; // Used for both X-ORGANIZATION-SECRET and X-USER-ID
-  apiVersion?: string;
-  baseUrl?: string;
+interface SensayAPIConfig {
+  apiKey: string;
+  baseURL?: string;
+  version?: string;
 }
 
 interface ReplicaConfig {
@@ -25,22 +25,20 @@ export interface ChatSession {
 
 export class SensayAPI {
   private client: AxiosInstance;
-  private baseUrl: string;
   private apiKey: string;
-  private apiVersion: string;
+  private version: string;
 
-  constructor(config: SensayConfig) {
+  constructor(config: SensayAPIConfig) {
     this.apiKey = config.apiKey;
-    this.apiVersion = config.apiVersion || '2025-03-25';
-    this.baseUrl = config.baseUrl || 'https://api.sensay.io';
-
+    this.version = config.version || '2025-03-25';
+    
     this.client = axios.create({
-      baseURL: this.baseUrl,
+      baseURL: config.baseURL || 'https://api.sensay.io',
       headers: {
-        'Content-Type': 'application/json',
         'X-ORGANIZATION-SECRET': this.apiKey,
         'X-USER-ID': this.apiKey,
-        'X-API-Version': this.apiVersion
+        'X-API-Version': this.version,
+        'Content-Type': 'application/json'
       }
     });
   }
@@ -51,70 +49,51 @@ export class SensayAPI {
       return response.data;
     } catch (error) {
       console.error('Error listing replicas:', error);
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        console.warn('Replicas endpoint not found, returning empty list');
-        return { replicas: [] };
-      }
       throw error;
     }
   }
 
-  async createChatSession(replicaConfig: ReplicaConfig): Promise<ChatSession> {
-    // For Sensay, a session is just a replica UUID and a message history
-    // We'll store the initial message as the first message in the session
-    const messages: Message[] = [];
-    if (replicaConfig.initialMessage) {
-      // Send the initial message to the chat completions endpoint
-      const response = await this.sendMessage(replicaConfig.id, replicaConfig.initialMessage);
-      messages.push({ role: 'user', content: replicaConfig.initialMessage, timestamp: new Date() });
-      if (response) messages.push(response);
-    }
-    return {
-      id: replicaConfig.id,
-      messages,
-      replicaId: replicaConfig.id
-    };
-  }
-
-  async sendMessage(replicaId: string, message: string): Promise<Message> {
+  async chatCompletion(replicaId: string, content: string, options?: {
+    skipChatHistory?: boolean;
+    source?: string;
+  }): Promise<any> {
     try {
-      // POST to /v1/replicas/{replicaUUID}/chat/completions
       const response = await this.client.post(`/v1/replicas/${replicaId}/chat/completions`, {
-        content: message,
-        skip_chat_history: false,
-        source: 'web'
+        content,
+        skip_chat_history: options?.skipChatHistory || false,
+        source: options?.source || 'web'
       });
-      return {
-        role: 'assistant',
-        content: response.data.content,
-        timestamp: new Date()
-      };
+      return response.data;
     } catch (error) {
-      console.error('Error sending message:', error);
-      if (axios.isAxiosError(error)) {
-        return {
-          role: 'assistant',
-          content: "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
-          timestamp: new Date()
-        };
-      }
+      console.error('Error in chat completion:', error);
       throw error;
     }
   }
 
-  async getChatHistory(replicaId: string): Promise<Message[]> {
+  async getChatHistory(replicaId: string, source: 'web' | 'discord' | 'embed' = 'web'): Promise<any> {
     try {
-      // GET /v1/replicas/{replicaUUID}/chat/history
-      const response = await this.client.get(`/v1/replicas/${replicaId}/chat/history`);
-      // Map API response to Message[]
-      return (response.data?.history || []).map((item: any) => ({
-        role: item.role,
-        content: item.content,
-        timestamp: item.created_at ? new Date(item.created_at) : undefined
-      }));
+      const endpoint = source === 'web' 
+        ? `/v1/replicas/${replicaId}/chat/history/web`
+        : `/v1/replicas/${replicaId}/chat/history`;
+      
+      const response = await this.client.get(endpoint);
+      return response.data;
     } catch (error) {
       console.error('Error getting chat history:', error);
-      return [];
+      throw error;
+    }
+  }
+
+  async createChatHistoryEntry(replicaId: string, content: string, source: string = 'web'): Promise<any> {
+    try {
+      const response = await this.client.post(`/v1/replicas/${replicaId}/chat/history`, {
+        content,
+        source
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating chat history entry:', error);
+      throw error;
     }
   }
 }
