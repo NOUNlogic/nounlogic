@@ -33,21 +33,26 @@ export const appwriteAuth = {
   // Create a new account
   createAccount: async (email: string, password: string, name: string) => {
     try {
+      // Make sure projectId and endpoint are set
+      if (!endpoint || !projectId || projectId === 'your-project-id') {
+        throw new Error('Appwrite endpoint or project ID is not set or is using a placeholder. Please update your .env.local file.');
+      }
       const newAccount = await account.create(
         ID.unique(),
         email,
         password,
         name
       );
-      
-      if (newAccount) {
-        // After creating account, log the user in
-        await appwriteAuth.login(email, password);
-      }
-      
+      // If your project requires email confirmation, do not auto-login here
+      // await appwriteAuth.login(email, password);
       return newAccount;
-    } catch (error) {
-      console.error('Error creating account:', error);
+    } catch (error: any) {
+      // Log the full error from Appwrite
+      if (error && error.message) {
+        console.error('Appwrite error:', error.message, error);
+      } else {
+        console.error('Error creating account:', error);
+      }
       throw error;
     }
   },
