@@ -3,12 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSensay } from './context';
 import { Message } from './api';
+import { 
+  TEACHING_ASSISTANT_CONFIG, 
+  SUBJECT_EXPERT_CONFIG, 
+  LEARNING_COACH_CONFIG 
+} from './config';
 
 // Default educational replicas by role
 const EDUCATION_REPLICAS = {
-  TEACHING_ASSISTANT: 'teacher-assistant', // Replace with actual replica ID
-  SUBJECT_EXPERT: 'subject-expert',        // Replace with actual replica ID
-  LEARNING_COACH: 'learning-coach',        // Replace with actual replica ID
+  TEACHING_ASSISTANT: TEACHING_ASSISTANT_CONFIG.replicaId,
+  SUBJECT_EXPERT: SUBJECT_EXPERT_CONFIG.replicaId,
+  LEARNING_COACH: LEARNING_COACH_CONFIG.replicaId,
 };
 
 export interface UseSensayEducationOptions {
@@ -63,11 +68,11 @@ export function useSensayEducation(options: UseSensayEducationOptions = {}) {
 
     switch (role) {
       case 'TEACHING_ASSISTANT':
-        return "You are an AI teaching assistant helping students with their questions. Your goal is to provide helpful, educational responses that aid understanding. Avoid giving direct answers to homework problems - instead guide students through the learning process.";
+        return TEACHING_ASSISTANT_CONFIG.initialPrompt;
       case 'SUBJECT_EXPERT':
-        return "You are an expert in your field, providing in-depth knowledge and insights. Focus on accuracy and clarity in your explanations, using analogies and examples when helpful.";
+        return SUBJECT_EXPERT_CONFIG.initialPrompt;
       case 'LEARNING_COACH':
-        return "You are a learning coach helping students develop effective study strategies and learning habits. Provide personalized advice based on the student's needs and learning style.";
+        return LEARNING_COACH_CONFIG.initialPrompt;
       default:
         return "You are an educational AI assistant helping with learning and teaching.";
     }

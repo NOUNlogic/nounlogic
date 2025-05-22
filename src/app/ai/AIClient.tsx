@@ -7,37 +7,39 @@ import Button from '@/components/ui/Button';
 import { ChatInterface } from '@/components/sensay/ChatComponents';
 import { useSensayEducation } from '@/lib/sensay/education';
 import { BrainIcon } from '@/components/ui/Icons';
+import { 
+  TEACHING_ASSISTANT_CONFIG, 
+  SUBJECT_EXPERT_CONFIG, 
+  LEARNING_COACH_CONFIG,
+  TOPIC_CONFIGS 
+} from '@/lib/sensay/config';
 
 // Educational topics for the AI assistant
-const TOPICS = [
-  { id: 'blockchain', name: 'Blockchain Fundamentals', prompt: 'I want to learn about blockchain fundamentals.' },
-  { id: 'web3', name: 'Web3 Development', prompt: 'Help me understand Web3 development concepts.' },
-  { id: 'defi', name: 'DeFi Basics', prompt: 'Explain DeFi (Decentralized Finance) basics to me.' },
-  { id: 'smart-contracts', name: 'Smart Contracts', prompt: 'I need help understanding smart contracts.' },
-  { id: 'nfts', name: 'NFTs & Digital Assets', prompt: 'What are NFTs and how do they work?' },
-  { id: 'crypto-economics', name: 'Crypto Economics', prompt: 'Explain crypto economics principles.' },
-  { id: 'dao', name: 'DAOs', prompt: 'What are DAOs and how do they function?' },
-  { id: 'security', name: 'Blockchain Security', prompt: 'I want to learn about blockchain security best practices.' },
-];
+const TOPICS = Object.entries(TOPIC_CONFIGS).map(([id, config]) => ({
+  id,
+  name: config.name,
+  prompt: config.prompt,
+  description: config.description
+}));
 
 // Different AI assistant roles
 const ASSISTANT_ROLES = [
   { 
     id: 'TEACHING_ASSISTANT', 
-    name: 'Teaching Assistant', 
-    description: 'Helps with educational concepts and coursework',
+    name: TEACHING_ASSISTANT_CONFIG.name, 
+    description: TEACHING_ASSISTANT_CONFIG.description,
     icon: 'teacher'
   },
   { 
     id: 'SUBJECT_EXPERT', 
-    name: 'Subject Expert', 
-    description: 'Provides in-depth knowledge on specific topics',
+    name: SUBJECT_EXPERT_CONFIG.name, 
+    description: SUBJECT_EXPERT_CONFIG.description,
     icon: 'expert'
   },
   { 
     id: 'LEARNING_COACH', 
-    name: 'Learning Coach', 
-    description: 'Assists with study strategies and learning methods',
+    name: LEARNING_COACH_CONFIG.name, 
+    description: LEARNING_COACH_CONFIG.description,
     icon: 'coach'
   }
 ];
