@@ -43,9 +43,11 @@ export const appwriteAuth = {
         password,
         name
       );
-      // If your project requires email confirmation, do not auto-login here
-      // await appwriteAuth.login(email, password);
-      return newAccount;
+      // After account creation, create a session (login)
+      await account.createEmailPasswordSession(email, password);
+      // Refresh user state
+      const user = await account.get();
+      return { newAccount, user };
     } catch (error: any) {
       // Log the full error from Appwrite
       if (error && error.message) {
@@ -60,7 +62,10 @@ export const appwriteAuth = {
   // Log in with email and password
   login: async (email: string, password: string) => {
     try {
-      return await account.createEmailSession(email, password);
+      await account.createEmailPasswordSession(email, password);
+      // Refresh user state
+      const user = await account.get();
+      return user;
     } catch (error) {
       console.error('Error logging in:', error);
       throw error;

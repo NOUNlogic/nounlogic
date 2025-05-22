@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { SensayProvider } from '@/lib/sensay/context';
+import { account, appwriteAuth } from '@/lib/appwrite';
 
 interface UserProfile {
   name?: string;
@@ -17,11 +18,12 @@ interface User {
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: any;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithWallet: (walletAddress: string) => Promise<void>;
-  logout: () => void;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,62 +41,62 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const refreshUser = async () => {
+    setIsLoading(true);
+    try {
+      const currentUser = await appwriteAuth.getCurrentUser();
+      setUser(currentUser);
+    } catch {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set mock user data
-      setUser({
-        email,
-        role: 'student',
-        profile: {
-          name: 'Demo User',
-          avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=John',
-          bio: 'Learning enthusiast'
-        }
-      });
+      await appwriteAuth.login(email, password);
+      await refreshUser();
     } finally {
       setIsLoading(false);
     }
   };
 
-  const loginWithWallet = async (walletAddress: string) => {
+  const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock wallet authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set mock user data
-      setUser({
-        email: `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}@web3.user`,
-        role: 'student',
-        walletAddress,
-        profile: {
-          name: 'Web3 User',
-          avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=' + walletAddress,
-          bio: 'Blockchain enthusiast'
-        }
-      });
+      await appwriteAuth.createAccount(email, password, name);
+      await login(email, password);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      await appwriteAuth.logout();
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const value = {
     user,
     isLoading,
     login,
-    loginWithWallet,
-    logout
+    register,
+    logout,
+    refreshUser,
   };
 
   return (
