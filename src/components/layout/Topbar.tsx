@@ -116,10 +116,7 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
                     <User size={16} className="mr-2" />
                     Profile
                   </a>
-                  <a href="/settings" className="flex items-center px-4 py-2 text-sm hover:bg-secondary/50 transition-colors">
-                    <Settings size={16} className="mr-2" />
-                    Settings
-                  </a>
+                  {/* Settings item removed */}
                   <div className="border-t border-border/50 mt-2 pt-2">
                     <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-danger hover:bg-danger/10 transition-colors">
                       <LogOut size={16} className="mr-2" />
