@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/CardComponents';
+import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle } from 'lucide-react';
 
 const RegisterClient = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [registerMethod, setRegisterMethod] = useState<'email' | 'wallet'>('email');
+  const [formStep, setFormStep] = useState(1);
+  const [formAnimation, setFormAnimation] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -24,6 +27,16 @@ const RegisterClient = () => {
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // For animating form transitions
+  useEffect(() => {
+    if (formAnimation) {
+      const timer = setTimeout(() => {
+        setFormAnimation(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [formAnimation]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
@@ -46,42 +59,65 @@ const RegisterClient = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (registerMethod === 'email') {
-      if (!formData.password) {
-        newErrors.password = 'Password is required';
-      } else if (formData.password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters';
+    if (formStep === 1) {
+      if (!formData.name.trim()) {
+        newErrors.name = 'Name is required';
       }
       
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Email is invalid';
       }
-    }
-    
-    if (!formData.institution.trim()) {
-      newErrors.institution = 'Institution is required';
-    }
-    
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms';
+      
+      if (registerMethod === 'email') {
+        if (!formData.password) {
+          newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+          newErrors.password = 'Password must be at least 8 characters';
+        }
+        
+        if (formData.password !== formData.confirmPassword) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        }
+      }
+    } else if (formStep === 2) {
+      if (!formData.institution.trim()) {
+        newErrors.institution = 'Institution is required';
+      }
+      
+      if (!formData.agreeToTerms) {
+        newErrors.agreeToTerms = 'You must agree to the terms';
+      }
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
+  const handleNextStep = () => {
+    if (validateForm()) {
+      setFormAnimation(true);
+      setTimeout(() => {
+        setFormStep(2);
+      }, 300);
+    }
+  };
+  
+  const handlePrevStep = () => {
+    setFormAnimation(true);
+    setTimeout(() => {
+      setFormStep(1);
+    }, 300);
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formStep === 1) {
+      handleNextStep();
+      return;
+    }
     
     if (!validateForm()) {
       return;
@@ -104,120 +140,84 @@ const RegisterClient = () => {
     }
   };
   
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">Create an Account</h1>
-          <p className="text-muted-foreground mt-2">
-            Join NounLogic Learning Management System
-          </p>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Register</CardTitle>
-            <CardDescription>
-              Choose your preferred registration method
-            </CardDescription>
-          </CardHeader>
+  const renderFormStep = () => {
+    if (formStep === 1) {
+      return (
+        <div className={`space-y-4 transition-all duration-300 ${formAnimation ? 'opacity-0 transform translate-x-10' : 'opacity-100 transform translate-x-0'}`}>
+          <Input
+            label="Full Name"
+            name="name"
+            placeholder="Enter your full name"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+            disabled={isLoading}
+          />
           
-          <CardContent>
-            <div className="flex gap-2 mb-6">
-              <button
-                type="button"
-                onClick={() => setRegisterMethod('email')}
-                className={`flex-1 py-2 rounded-md font-medium ${
-                  registerMethod === 'email'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground'
-                }`}
-              >
-                Email
-              </button>
-              <button
-                type="button"
-                onClick={() => setRegisterMethod('wallet')}
-                className={`flex-1 py-2 rounded-md font-medium ${
-                  registerMethod === 'wallet'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground'
-                }`}
-              >
-                Web3 Wallet
-              </button>
-            </div>
-            
-            {errors.form && (
-              <div className="bg-danger/10 border border-danger/30 text-danger rounded-md p-3 mb-4 text-sm">
-                {errors.form}
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit}>
-              {registerMethod === 'email' ? (
-                <div className="space-y-4">
-                  <Input
-                    label="Full Name"
-                    name="name"
-                    placeholder="Enter your full name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    error={errors.name}
-                    disabled={isLoading}
-                  />
-                  
-                  <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    error={errors.email}
-                    disabled={isLoading}
-                  />
-                  
-                  <Input
-                    label="Password"
-                    name="password"
-                    type="password"
-                    placeholder="Create a password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    error={errors.password}
-                    disabled={isLoading}
-                  />
-                  
-                  <Input
-                    label="Confirm Password"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    error={errors.confirmPassword}
-                    disabled={isLoading}
-                  />
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">
-                      Institution
-                    </label>
-                    <select
-                      name="institution"
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={formData.institution}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                    >
-                      <option value="">Select an institution</option>
-                      <option value="Blockchain Academy">Blockchain Academy</option>
-                      <option value="Tech University">Tech University</option>
-                      <option value="AI Institute">AI Institute</option>
-                      <option value="Code Academy">Code Academy</option>
-                      <option value="Crypto Institute">Crypto Institute</option>
-                      <option value="Global Tech College">Global Tech College</option>
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+            disabled={isLoading}
+          />
+          
+          {registerMethod === 'email' && (
+            <>
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="Create a password"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                disabled={isLoading}
+              />
+              
+              <Input
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                error={errors.confirmPassword}
+                disabled={isLoading}
+              />
+            </>
+          )}
+          
+          <Button
+            type="button"
+            className="w-full mt-2 group"
+            disabled={isLoading}
+            onClick={handleNextStep}
+          >
+            Next Step
+          </Button>
+        </div>
+      );
+    }
+    
+    return (
+      <div className={`space-y-4 transition-all duration-300 ${formAnimation ? 'opacity-0 transform -translate-x-10' : 'opacity-100 transform translate-x-0'}`}>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium flex items-center gap-2">
+            <Building size={16} />
+            Institution
+          </label>
+          <select
+            name="institution"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+            value={formData.institution}
+            onChange={handleChange}
+            disabled={isLoading}
+          >
+            <option value="">Select an institution</option>
                     </select>
                     {errors.institution && (
                       <p className="text-sm text-danger">{errors.institution}</p>
