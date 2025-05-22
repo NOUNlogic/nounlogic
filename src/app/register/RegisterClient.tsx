@@ -218,63 +218,167 @@ const RegisterClient = () => {
             disabled={isLoading}
           >
             <option value="">Select an institution</option>
-                    </select>
-                    {errors.institution && (
-                      <p className="text-sm text-danger">{errors.institution}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium">
-                      Role
-                    </label>
-                    <select
-                      name="role"
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={formData.role}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                    >
-                      <option value="student">Student</option>
-                      <option value="instructor">Instructor</option>
-                      <option value="institution">Institution Admin</option>
-                    </select>
-                  </div>
-                  
-                  <div className="flex items-start mt-4">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="agreeToTerms"
-                        name="agreeToTerms"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-                        checked={formData.agreeToTerms}
-                        onChange={handleChange}
-                        disabled={isLoading}
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label htmlFor="agreeToTerms" className="font-medium">
-                        I agree to the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
-                      </label>
-                      {errors.agreeToTerms && (
-                        <p className="text-sm text-danger">{errors.agreeToTerms}</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <Button
-                    type="submit"
-                    className="w-full mt-2"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Creating Account...' : 'Create Account'}
-                  </Button>
+            <option value="Blockchain Academy">Blockchain Academy</option>
+            <option value="Tech University">Tech University</option>
+            <option value="AI Institute">AI Institute</option>
+            <option value="Code Academy">Code Academy</option>
+            <option value="Crypto Institute">Crypto Institute</option>
+            <option value="Global Tech College">Global Tech College</option>
+          </select>
+          {errors.institution && (
+            <p className="text-sm text-danger flex items-center gap-1 mt-1">
+              <AlertCircle size={14} />
+              {errors.institution}
+            </p>
+          )}
+        </div>
+        
+        <div className="space-y-2">
+          <label className="block text-sm font-medium flex items-center gap-2">
+            <UserCheck size={16} />
+            Role
+          </label>
+          <select
+            name="role"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+            value={formData.role}
+            onChange={handleChange}
+            disabled={isLoading}
+          >
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="institution">Institution Admin</option>
+          </select>
+        </div>
+        
+        <div className="mt-4 bg-secondary/30 p-4 rounded-lg border border-secondary/20">
+          <div className="flex items-start mt-1">
+            <div className="flex items-center h-5">
+              <input
+                id="agreeToTerms"
+                name="agreeToTerms"
+                type="checkbox"
+                className="h-4 w-4 rounded border-input text-primary focus:ring-primary transition-colors"
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="agreeToTerms" className="font-medium">
+                I agree to the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+              </label>
+              {errors.agreeToTerms && (
+                <p className="text-sm text-danger flex items-center gap-1 mt-1">
+                  <AlertCircle size={14} />
+                  {errors.agreeToTerms}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            disabled={isLoading}
+            onClick={handlePrevStep}
+          >
+            Back
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1 group"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Creating Account...' : 'Create Account'}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/80 to-background p-4 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full bg-grid-pattern opacity-5"></div>
+      
+      <div className="relative w-full max-w-md z-10">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+            Create an Account
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Join NounLogic Learning Management System
+          </p>
+        </div>
+        
+        <Card className="shadow-xl border-opacity-30 backdrop-blur-sm bg-card/95">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Register</CardTitle>
+            <CardDescription className="text-center">
+              {formStep === 1 ? 'Start by creating your account' : 'Complete your profile information'}
+            </CardDescription>
+            
+            {/* Progress indicator */}
+            <div className="w-full flex items-center justify-center mt-4">
+              <div className="w-2/3 flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+                  1
                 </div>
+                <div className={`flex-1 h-1 ${formStep >= 2 ? 'bg-primary' : 'bg-secondary'}`}></div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+                  2
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          
+          <CardContent>
+            {formStep === 1 && (
+              <div className="flex gap-2 mb-6 rounded-lg p-1 bg-secondary/50">
+                <button
+                  type="button"
+                  onClick={() => setRegisterMethod('email')}
+                  className={`flex-1 py-2.5 rounded-md font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
+                    registerMethod === 'email'
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-transparent hover:bg-secondary/80 text-secondary-foreground'
+                  }`}
+                >
+                  <Mail size={18} />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRegisterMethod('wallet')}
+                  className={`flex-1 py-2.5 rounded-md font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
+                    registerMethod === 'wallet'
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-transparent hover:bg-secondary/80 text-secondary-foreground'
+                  }`}
+                >
+                  <Wallet size={18} />
+                  Web3 Wallet
+                </button>
+              </div>
+            )}
+            
+            {errors.form && (
+              <div className="bg-danger/10 border border-danger/30 text-danger rounded-md p-3 mb-4 text-sm flex items-start gap-2 animate-fadeIn">
+                <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
+                <span>{errors.form}</span>
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+              {registerMethod === 'email' ? (
+                renderFormStep()
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-secondary p-6 rounded-md text-center">
-                    <div className="text-2xl mb-2">🦊</div>
+                  <div className="bg-gradient-to-br from-secondary/40 to-secondary/80 p-6 rounded-xl text-center transform transition-all hover:scale-[1.02] border border-secondary/20">
+                    <div className="text-3xl mb-3">🦊</div>
                     <p className="text-muted-foreground text-sm mb-6">
                       Connect your wallet to register using your blockchain identity
                     </p>
@@ -320,14 +424,22 @@ const RegisterClient = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full hover:bg-secondary/20 transition-colors"
               >
                 Sign In
               </Button>
             </Link>
           </CardFooter>
         </Card>
+        
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} NounLogic. All rights reserved.</p>
+        </div>
       </div>
+      
+      {/* Background decoration elements */}
+      <div className="hidden md:block absolute top-20 right-20 w-64 h-64 bg-primary/20 rounded-full filter blur-3xl opacity-30 animate-pulse-slow"></div>
+      <div class="hidden md:block absolute bottom-20 left-20 w-72 h-72 bg-accent/20 rounded-full filter blur-3xl opacity-30 animate-pulse-slow animation-delay-2000"></div>
     </div>
   );
 };

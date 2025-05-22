@@ -134,7 +134,7 @@ const LoginClient = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
-                      icon={<Mail className="text-muted-foreground" size={18} />}
+                      leftIcon={<Mail className="text-muted-foreground" size={18} />}
                     />
                     <Input
                       label="Password"
@@ -143,7 +143,7 @@ const LoginClient = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
-                      icon={<Lock className="text-muted-foreground" size={18} />}
+                      leftIcon={<Lock className="text-muted-foreground" size={18} />}
                     />
                     <div className="flex justify-end">
                       <Link 
