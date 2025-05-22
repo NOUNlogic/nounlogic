@@ -45,29 +45,18 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize Sensay API client (no API version unless required)
   const initializeApi = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
       const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
-      const apiVersion = process.env.NEXT_PUBLIC_SENSAY_API_VERSION;
-      
-      if (!apiKey) {
-        throw new Error('Sensay API key is not configured');
-      }
-      
-      const sensayApi = new SensayAPI({
-        apiKey,
-        apiVersion: apiVersion || '2023-06-01'
-      });
-      
+      if (!apiKey) throw new Error('Sensay API key is not configured');
+      const sensayApi = new SensayAPI({ apiKey });
       setApi(sensayApi);
-      
       // Fetch available replicas
       const replicasData = await sensayApi.listReplicas();
       setReplicas(replicasData.replicas || []);
-      
       setIsInitialized(true);
     } catch (err) {
       console.error('Failed to initialize Sensay API:', err);
@@ -77,28 +66,15 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
     }
   };
 
+  // Create a chat session for a given replica
   const createChatSession = async (replicaId: string, initialMessage?: string): Promise<ChatSession> => {
-    if (!api) {
-      throw new Error('Sensay API not initialized');
-    }
-    
+    if (!api) throw new Error('Sensay API not initialized');
     setIsLoading(true);
     setError(null);
-    
     try {
-      const session = await api.createChatSession({
-        id: replicaId,
-        initialMessage
-      });
-      
+      const session = await api.createChatSession({ id: replicaId, initialMessage });
       setActiveChatSession(session);
-      
-      // Add to chat history
-      setChatHistory(prev => ({
-        ...prev,
-        [session.id]: session
-      }));
-      
+      setChatHistory(prev => ({ ...prev, [session.id]: session }));
       return session;
     } catch (err) {
       console.error('Failed to create chat session:', err);
@@ -109,58 +85,23 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
     }
   };
 
+  // Send a message in the current chat session
   const sendMessage = async (message: string): Promise<Message | null> => {
-    if (!api || !activeChatSession) {
-      throw new Error('No active chat session');
-    }
-    
+    if (!api || !activeChatSession) throw new Error('No active chat session');
     setIsLoading(true);
     setError(null);
-    
     try {
       // Add user message to the session
-      const userMessage: Message = {
-        role: 'user',
-        content: message,
-        timestamp: new Date()
-      };
-      
-      // Update chat session with user message
-      setActiveChatSession(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          messages: [...prev.messages, userMessage]
-        };
-      });
-      
+      const userMessage: Message = { role: 'user', content: message, timestamp: new Date() };
+      setActiveChatSession(prev => prev ? { ...prev, messages: [...prev.messages, userMessage] } : null);
       // Send message to API
       const response = await api.sendMessage(activeChatSession.id, message);
-      
-      // Update chat session with assistant response
-      setActiveChatSession(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          messages: [...prev.messages, response]
-        };
-      });
-      
-      // Update chat history
+      setActiveChatSession(prev => prev ? { ...prev, messages: [...prev.messages, response] } : null);
       setChatHistory(prev => {
         if (!activeChatSession) return prev;
-        
-        const updatedSession = {
-          ...activeChatSession,
-          messages: [...activeChatSession.messages, userMessage, response]
-        };
-        
-        return {
-          ...prev,
-          [activeChatSession.id]: updatedSession
-        };
+        const updatedSession = { ...activeChatSession, messages: [...activeChatSession.messages, userMessage, response] };
+        return { ...prev, [activeChatSession.id]: updatedSession };
       });
-      
       return response;
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -171,9 +112,7 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
     }
   };
 
-  const clearActiveChatSession = () => {
-    setActiveChatSession(null);
-  };
+  const clearActiveChatSession = () => setActiveChatSession(null);
 
   const value = {
     isInitialized,
