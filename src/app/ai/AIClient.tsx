@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/CardComponents';
 import Button from '@/components/ui/Button';
@@ -52,6 +52,7 @@ const AIClient = () => {
     messages,
     sendMessage,
     isLoading,
+    setIsLoading,
     isReady,
     initialize
   } = useSensayEducation({
@@ -59,19 +60,47 @@ const AIClient = () => {
     autoInitialize: false
   });
 
+  // Auto-initialize on component mount
+  useEffect(() => {
+    if (!isReady && !isLoading) {
+      // This will call initializeApi() internally in useSensayEducation
+      initialize().catch(err => {
+        console.error("Failed to initialize Sensay:", err);
+        // Show a user-friendly error message
+        alert("Failed to initialize AI assistant. Please check your API key and try again.");
+      });
+    }
+  }, [isReady, isLoading, initialize]);
+
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
   };
 
   const handleStartChat = async (initialPrompt?: string) => {
     try {
-      await initialize();
+      // Show visual feedback that something is happening
+      setIsLoading(true);
+      console.log("Starting chat...");
+      
+      // Make sure we're initialized
+      if (!isReady) {
+        console.log("Initializing API first...");
+        await initialize();
+      }
+      
+      // If there's an initial prompt, send it
       if (initialPrompt) {
+        console.log("Sending initial prompt:", initialPrompt);
         await sendMessage(initialPrompt);
       }
+      
+      // Switch to chat view
       setIsConfiguring(false);
     } catch (error) {
       console.error('Failed to start chat:', error);
+      alert("Could not start chat. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,9 +163,15 @@ const AIClient = () => {
                       <Button
                         onClick={() => handleStartChat()}
                         className="w-full"
+                        disabled={isLoading}
                       >
-                        Start Custom Conversation
+                        {isLoading ? 'Starting...' : 'Start Custom Conversation'}
                       </Button>
+                      {!isReady && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {isLoading ? 'Connecting to AI...' : 'AI Assistant ready to chat'}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -157,8 +192,8 @@ const AIClient = () => {
                     {TOPICS.map((topic) => (
                       <div
                         key={topic.id}
-                        className="p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-colors"
-                        onClick={() => handleStartChat(topic.prompt)}
+                        className={`p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-colors ${isLoading ? 'opacity-50' : ''}`}
+                        onClick={() => !isLoading && handleStartChat(topic.prompt)}
                       >
                         <h3 className="font-medium">{topic.name}</h3>
                         <p className="text-sm text-muted-foreground mt-1">

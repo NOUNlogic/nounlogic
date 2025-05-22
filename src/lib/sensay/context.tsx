@@ -7,7 +7,7 @@ import {
   useEffect, 
   ReactNode 
 } from 'react';
-import { SensayAPI, ChatSession, Message } from './api';
+import { SensayAPI, ChatSession, Message, MockSensayAPI } from './api';
 
 interface SensayContextType {
   isInitialized: boolean;
@@ -52,15 +52,43 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
       setError(null);
       const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
       if (!apiKey) throw new Error('Sensay API key is not configured');
+      
       const sensayApi = new SensayAPI({ apiKey });
-      setApi(sensayApi);
+      
+      // Test the API with a simple call
+      try {
+        await sensayApi.listReplicas();
+        console.log("Successfully connected to Sensay API");
+        setApi(sensayApi);
+      } catch (apiError) {
+        console.warn("Sensay API unavailable, falling back to mock:", apiError);
+        // Fall back to mock API
+        const mockApi = new MockSensayAPI();
+        setApi(mockApi);
+        setError("Using demo mode - Sensay API unavailable");
+      }
+      
       // Fetch available replicas
-      const replicasData = await sensayApi.listReplicas();
+      const replicasData = await api!.listReplicas();
       setReplicas(replicasData.replicas || []);
+      
       setIsInitialized(true);
     } catch (err) {
       console.error('Failed to initialize Sensay API:', err);
       setError(err instanceof Error ? err.message : 'Failed to initialize Sensay API');
+      
+      // Last resort - use mock API even after other errors
+      try {
+        console.warn("Using mock API as last resort");
+        const mockApi = new MockSensayAPI();
+        setApi(mockApi);
+        const replicasData = await mockApi.listReplicas();
+        setReplicas(replicasData.replicas || []);
+        setIsInitialized(true);
+        setError("Using demo mode - Sensay API unavailable");
+      } catch (mockError) {
+        console.error("Even mock API failed:", mockError);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -87,21 +115,38 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
 
   // Send a message in the current chat session
   const sendMessage = async (message: string): Promise<Message | null> => {
-    if (!api || !activeChatSession) throw new Error('No active chat session');
+    if (!api) {
+      console.error("Cannot send message: API not initialized");
+      await initializeApi();
+      if (!api) throw new Error('No active API connection');
+    }
+    
+    if (!activeChatSession) {
+      console.error("Cannot send message: No active chat session");
+      throw new Error('No active chat session');
+    }
+    
     setIsLoading(true);
     setError(null);
+    
     try {
+      console.log(`Sending message to session ${activeChatSession.id}: ${message}`);
+      
       // Add user message to the session
       const userMessage: Message = { role: 'user', content: message, timestamp: new Date() };
       setActiveChatSession(prev => prev ? { ...prev, messages: [...prev.messages, userMessage] } : null);
+      
       // Send message to API
       const response = await api.sendMessage(activeChatSession.id, message);
+      console.log(`Received response: ${response.content}`);
+      
       setActiveChatSession(prev => prev ? { ...prev, messages: [...prev.messages, response] } : null);
       setChatHistory(prev => {
         if (!activeChatSession) return prev;
         const updatedSession = { ...activeChatSession, messages: [...activeChatSession.messages, userMessage, response] };
         return { ...prev, [activeChatSession.id]: updatedSession };
       });
+      
       return response;
     } catch (err) {
       console.error('Failed to send message:', err);

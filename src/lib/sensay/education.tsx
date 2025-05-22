@@ -34,33 +34,13 @@ export function useSensayEducation(options: UseSensayEducationOptions = {}) {
   const sensay = useSensay();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
 
   // Get the appropriate replica ID based on role or use the provided one
   const getReplicaId = useCallback(() => {
     if (replicaId) return replicaId;
     return EDUCATION_REPLICAS[role];
   }, [replicaId, role]);
-
-  // Initialize the API and create a chat session
-  const initialize = useCallback(async () => {
-    try {
-      if (!sensay.isInitialized) {
-        await sensay.initializeApi();
-      }
-
-      // Create a new chat session with the appropriate replica
-      const targetReplicaId = getReplicaId();
-      const customPrompt = getInitialPrompt();
-      
-      const session = await sensay.createChatSession(targetReplicaId, customPrompt);
-      setMessages(session.messages);
-      setIsReady(true);
-      return session;
-    } catch (error) {
-      console.error('Failed to initialize Sensay education session:', error);
-      throw error;
-    }
-  }, [sensay, getReplicaId]);
 
   // Get the appropriate initial prompt based on the role
   const getInitialPrompt = useCallback(() => {
@@ -78,9 +58,34 @@ export function useSensayEducation(options: UseSensayEducationOptions = {}) {
     }
   }, [role, initialPrompt]);
 
+  // Initialize the API and create a chat session
+  const initialize = useCallback(async () => {
+    try {
+      setLocalLoading(true);
+      if (!sensay.isInitialized) {
+        await sensay.initializeApi();
+      }
+
+      // Create a new chat session with the appropriate replica
+      const targetReplicaId = getReplicaId();
+      const customPrompt = getInitialPrompt();
+      
+      const session = await sensay.createChatSession(targetReplicaId, customPrompt);
+      setMessages(session.messages);
+      setIsReady(true);
+      return session;
+    } catch (error) {
+      console.error('Failed to initialize Sensay education session:', error);
+      throw error;
+    } finally {
+      setLocalLoading(false);
+    }
+  }, [sensay, getReplicaId, getInitialPrompt]);
+
   // Send a message to the AI
   const sendMessage = useCallback(async (content: string) => {
     try {
+      setLocalLoading(true);
       if (!isReady) {
         await initialize();
       }
@@ -98,22 +103,25 @@ export function useSensayEducation(options: UseSensayEducationOptions = {}) {
     } catch (error) {
       console.error('Failed to send message:', error);
       throw error;
+    } finally {
+      setLocalLoading(false);
     }
   }, [sensay, isReady, initialize]);
 
   // Auto-initialize on component mount if specified
   useEffect(() => {
-    if (autoInitialize && !isReady && !sensay.isLoading) {
+    if (autoInitialize && !isReady && !sensay.isLoading && !localLoading) {
       initialize().catch(console.error);
     }
-  }, [autoInitialize, isReady, sensay.isLoading, initialize]);
+  }, [autoInitialize, isReady, sensay.isLoading, localLoading, initialize]);
 
   return {
     messages,
     sendMessage,
     initialize,
     isReady,
-    isLoading: sensay.isLoading,
+    isLoading: sensay.isLoading || localLoading,
+    setIsLoading: setLocalLoading,
     error: sensay.error,
   };
 }
