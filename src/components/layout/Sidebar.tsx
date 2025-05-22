@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
-  LayoutDashboard, BookOpen, Building, Users, BarChart2,
-  Plug, Brain, Wallet, Settings, ChevronLeft, ChevronRight
+  LayoutDashboard, BookOpen, Building, BarChart2,
+  Plug, Brain, Wallet, ChevronLeft, ChevronRight
 } from "lucide-react";
 
 interface SidebarProps {
@@ -30,15 +30,12 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   ];
 
   const secondaryNavItems = [
-    { name: "Users", href: "/users", icon: Users },
-    { name: "Analytics", href: "/analytics", icon: BarChart2 },
     { name: "Integrations", href: "/integrations", icon: Plug },
   ];
 
   const techNavItems = [
     { name: "AI", href: "/ai", icon: Brain },
     { name: "Web3", href: "/web3", icon: Wallet },
-    { name: "Settings", href: "/settings", icon: Settings },
   ];
   
   const renderNavSection = (items: any[], sectionTitle?: string) => (
