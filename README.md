@@ -37,75 +37,44 @@ src/
 ├── components/            # Reusable UI components
 │   ├── layout/            # Layout components
 │   │   ├── Layout.tsx     # Base layout
-   ```
+│   │   └── MainLayout.tsx # Main app layout with sidebar
+│   │
+│   └── ui/                # UI components
+│       ├── Button.tsx     # Button component
+│       ├── CardComponents.tsx # Card components
+│       ├── Icons.tsx      # Icon components
+│       └── Input.tsx      # Input component
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+## Getting Started
 
-3. Copy the environment variables file:
-   ```bash
-   cp env.sample .env.local
-   ```
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Run the development server: `npm run dev`
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-4. Update the `.env.local` file with your Appwrite credentials and other configuration.
+## UI Components
 
-5. Run the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+The UI is built with a component-based architecture:
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **Layouts**: Page layouts with navigation
+- **UI Components**: Reusable UI elements
+- **Client Components**: Interactive components with client-side logic
+- **Page Components**: Server components that render pages
 
-## Appwrite Setup
+## Authentication
 
-### 1. Create a Project
+The app supports multiple authentication methods:
 
-1. Sign up or log in to [Appwrite Console](https://cloud.appwrite.io/)
-2. Create a new project
-3. Copy the Project ID to your `.env.local` file
+- Email/password authentication
+- Web3 wallet authentication (MetaMask, etc.)
 
-### 2. Create Databases and Collections
+## Web3 Integration
 
-Follow the database schema in the [database.md](/docx/database.md) file to set up all required databases and collections in Appwrite.
-
-### 3. Configure Authentication
-
-1. In the Appwrite Console, go to Auth > Settings
-2. Enable Email/Password authentication method
-3. Optionally, set up OAuth providers (Google, GitHub, etc.)
-
-### 4. Set up Storage
-
-1. Create the required storage buckets:
-   - `avatars`: For user profile images
-   - `course_media`: For course-related media files
-   - `certificates`: For certificate templates and files
-
-## Web3 Integration (Optional)
-
-To enable Web3 features like blockchain certificates:
-
-1. Set `NEXT_PUBLIC_ENABLE_WEB3=true` in your `.env.local` file
-2. Configure the blockchain network and RPC URL
-3. Deploy the certificate smart contracts (provided in `/contracts` directory)
-
-## AI Features (Optional)
-
-To enable AI-powered content recommendations:
-
-1. Set `NEXT_PUBLIC_ENABLE_AI_FEATURES=true` in your `.env.local` file
-2. Configure the AI service endpoints if needed
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- **Blockchain Certificates**: Issue and verify certificates on-chain
+- **Wallet Connection**: Connect to Web3 wallets
+- **Transaction History**: View blockchain transactions
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT
