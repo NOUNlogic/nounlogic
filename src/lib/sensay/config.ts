@@ -135,16 +135,22 @@ export const getSensayConfig = () => {
 
 // Initialize Sensay API client
 export const createSensayClient = () => {
-  const config = getSensayConfig();
+  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
+  const apiVersion = process.env.NEXT_PUBLIC_SENSAY_API_VERSION || '2025-03-25';
   
-  if (!config) {
+  if (!apiKey || apiKey === 'your-sensay-api-key') {
+    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY in your environment variables.');
     return null;
   }
 
   try {
-    // Import SensayAPI dynamically to avoid issues
-    const { SensayAPI } = require('./sensay-sdk/SensayAPI');
-    return new SensayAPI(config);
+    // Import SensayAPI from the new api.ts file
+    const { SensayAPI } = require('./api');
+    return new SensayAPI({
+      apiKey,
+      baseURL: 'https://api.sensay.io',
+      version: apiVersion
+    });
   } catch (error) {
     console.error('Failed to initialize Sensay API:', error);
     return null;
