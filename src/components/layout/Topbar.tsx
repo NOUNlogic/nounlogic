@@ -1,14 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, Search, Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { account } from '@/lib/appwrite';
 
 interface TopbarProps {
   toggleSidebar: () => void;
 }
 
 const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await account.get();
+        setUser(userData);
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await account.deleteSession('current');
+    setUser(null);
+    window.location.reload();
+  };
 
   return (
     <header className="h-16 bg-card/95 backdrop-blur-lg border-b border-border/50 px-4 md:px-6 flex items-center justify-between sticky top-0 z-20">
@@ -66,35 +89,50 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="flex items-center space-x-2 p-2 rounded-lg hover:bg-secondary/80 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <span className="text-sm font-medium text-primary-foreground">JD</span>
-            </div>
-            <span className="hidden md:block text-sm font-medium">John Doe</span>
+            {user ? (
+              <img src={user.prefs?.avatar || user.avatar || '/avatar.svg'} alt="avatar" className="h-8 w-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <span className="text-sm font-medium text-primary-foreground">JD</span>
+              </div>
+            )}
+            <span className="hidden md:block text-sm font-medium">
+              {user ? user.name || user.email : 'Account'}
+            </span>
             <ChevronDown size={16} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
           </button>
           
           {userMenuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border/50 backdrop-blur-lg z-50">
-              <div className="py-2">
-                <div className="px-4 py-2 border-b border-border/50">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">john@example.com</p>
+              {loading ? (
+                <div className="p-4 text-center text-muted-foreground">Loading...</div>
+              ) : user ? (
+                <div className="py-2">
+                  <div className="px-4 py-2 border-b border-border/50">
+                    <p className="text-sm font-medium">{user.name || user.email}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <a href="/profile" className="flex items-center px-4 py-2 text-sm hover:bg-secondary/50 transition-colors">
+                    <User size={16} className="mr-2" />
+                    Profile
+                  </a>
+                  <a href="/settings" className="flex items-center px-4 py-2 text-sm hover:bg-secondary/50 transition-colors">
+                    <Settings size={16} className="mr-2" />
+                    Settings
+                  </a>
+                  <div className="border-t border-border/50 mt-2 pt-2">
+                    <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-danger hover:bg-danger/10 transition-colors">
+                      <LogOut size={16} className="mr-2" />
+                      Sign out
+                    </button>
+                  </div>
                 </div>
-                <a href="/profile" className="flex items-center px-4 py-2 text-sm hover:bg-secondary/50 transition-colors">
-                  <User size={16} className="mr-2" />
-                  Profile
-                </a>
-                <a href="/settings" className="flex items-center px-4 py-2 text-sm hover:bg-secondary/50 transition-colors">
-                  <Settings size={16} className="mr-2" />
-                  Settings
-                </a>
-                <div className="border-t border-border/50 mt-2 pt-2">
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-danger hover:bg-danger/10 transition-colors">
-                    <LogOut size={16} className="mr-2" />
-                    Sign out
-                  </button>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <a href="/login" className="block px-4 py-2 text-foreground hover:bg-accent">Sign in</a>
+                  <a href="/register" className="block px-4 py-2 text-foreground hover:bg-accent">Register</a>
+                </>
+              )}
             </div>
           )}
         </div>
