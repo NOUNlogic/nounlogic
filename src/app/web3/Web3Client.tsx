@@ -36,7 +36,7 @@ const Web3Client = () => {
       tokenId: '24680',
       contractAddress: '0xabcd...ef12',
       network: 'Ethereum',
-      image: 'https://via.placeholder.com/400x300/10b981/ffffff?text=DeFi+Certificate',
+      image: 'https://unsplash.com/photos/a-bitcoin-sitting-on-top-of-a-pile-of-gold-coins-piiqiVnhJkM',
     },
   ];
 

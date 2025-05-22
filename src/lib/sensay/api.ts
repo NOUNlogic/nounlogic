@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 
 interface SensayConfig {
-  apiKey: string;
+  apiKey: string; // Used for both X-ORGANIZATION-SECRET and X-USER-ID
   apiVersion?: string;
   baseUrl?: string;
 }
 
 interface ReplicaConfig {
-  id: string;
+  id: string; // This is the replica UUID
   initialMessage?: string;
 }
 
@@ -18,7 +18,7 @@ export interface Message {
 }
 
 export interface ChatSession {
-  id: string;
+  id: string; // Use replica UUID as session id
   messages: Message[];
   replicaId: string;
 }
@@ -31,14 +31,15 @@ export class SensayAPI {
 
   constructor(config: SensayConfig) {
     this.apiKey = config.apiKey;
-    this.apiVersion = config.apiVersion || '2023-06-01';
+    this.apiVersion = config.apiVersion || '2025-03-25';
     this.baseUrl = config.baseUrl || 'https://api.sensay.io';
 
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
+        'X-ORGANIZATION-SECRET': this.apiKey,
+        'X-USER-ID': this.apiKey,
         'X-API-Version': this.apiVersion
       }
     });
@@ -46,12 +47,10 @@ export class SensayAPI {
 
   async listReplicas(): Promise<any> {
     try {
-      // Use v1/replicas instead of /replicas - common API versioning pattern
       const response = await this.client.get('/v1/replicas');
       return response.data;
     } catch (error) {
       console.error('Error listing replicas:', error);
-      // If we get a 404, return an empty list instead of throwing
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         console.warn('Replicas endpoint not found, returning empty list');
         return { replicas: [] };
@@ -61,32 +60,30 @@ export class SensayAPI {
   }
 
   async createChatSession(replicaConfig: ReplicaConfig): Promise<ChatSession> {
-    try {
-      // Use v1/chat/sessions instead of /chat/sessions
-      const response = await this.client.post('/v1/chat/sessions', {
-        replica_id: replicaConfig.id,
-        initial_message: replicaConfig.initialMessage
-      });
-      
-      return {
-        id: response.data.id,
-        messages: response.data.messages || [],
-        replicaId: replicaConfig.id
-      };
-    } catch (error) {
-      console.error('Error creating chat session:', error);
-      throw error;
+    // For Sensay, a session is just a replica UUID and a message history
+    // We'll store the initial message as the first message in the session
+    const messages: Message[] = [];
+    if (replicaConfig.initialMessage) {
+      // Send the initial message to the chat completions endpoint
+      const response = await this.sendMessage(replicaConfig.id, replicaConfig.initialMessage);
+      messages.push({ role: 'user', content: replicaConfig.initialMessage, timestamp: new Date() });
+      if (response) messages.push(response);
     }
+    return {
+      id: replicaConfig.id,
+      messages,
+      replicaId: replicaConfig.id
+    };
   }
 
-  async sendMessage(sessionId: string, message: string): Promise<Message> {
+  async sendMessage(replicaId: string, message: string): Promise<Message> {
     try {
-      // Use v1/chat/sessions/... instead of /chat/sessions/...
-      const response = await this.client.post(`/v1/chat/sessions/${sessionId}/messages`, {
-        role: 'user',
-        content: message
+      // POST to /v1/replicas/{replicaUUID}/chat/completions
+      const response = await this.client.post(`/v1/replicas/${replicaId}/chat/completions`, {
+        content: message,
+        skip_chat_history: false,
+        source: 'web'
       });
-      
       return {
         role: 'assistant',
         content: response.data.content,
@@ -94,9 +91,7 @@ export class SensayAPI {
       };
     } catch (error) {
       console.error('Error sending message:', error);
-      // If we get a 404 or any other error, provide a fallback response
       if (axios.isAxiosError(error)) {
-        console.warn(`API error (${error.response?.status}): ${error.message}`);
         return {
           role: 'assistant',
           content: "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
@@ -107,18 +102,19 @@ export class SensayAPI {
     }
   }
 
-  async getChatSession(sessionId: string): Promise<ChatSession> {
+  async getChatHistory(replicaId: string): Promise<Message[]> {
     try {
-      const response = await this.client.get(`/chat/sessions/${sessionId}`);
-      
-      return {
-        id: response.data.id,
-        messages: response.data.messages || [],
-        replicaId: response.data.replica_id
-      };
+      // GET /v1/replicas/{replicaUUID}/chat/history
+      const response = await this.client.get(`/v1/replicas/${replicaId}/chat/history`);
+      // Map API response to Message[]
+      return (response.data?.history || []).map((item: any) => ({
+        role: item.role,
+        content: item.content,
+        timestamp: item.created_at ? new Date(item.created_at) : undefined
+      }));
     } catch (error) {
-      console.error('Error getting chat session:', error);
-      throw error;
+      console.error('Error getting chat history:', error);
+      return [];
     }
   }
 }

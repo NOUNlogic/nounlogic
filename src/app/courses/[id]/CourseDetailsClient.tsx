@@ -6,16 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/CardCo
 import Button from '@/components/ui/Button';
 
 interface CourseDetailsClientProps {
-  courseId: string;
+  id: string;
 }
 
-const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) => {
+const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ id }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [activeModuleId, setActiveModuleId] = useState('module1');
 
   // Mock course data
   const course = {
-    id: courseId,
+    id,
     title: 'Introduction to Web3',
     description: 'Learn the fundamentals of blockchain, cryptocurrencies, and decentralized applications.',
     longDescription: `
@@ -246,7 +246,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -511,7 +511,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -526,7 +526,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -541,7 +541,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -558,7 +558,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
@@ -573,7 +573,7 @@ const CourseDetailsClient: React.FC<CourseDetailsClientProps> = ({ courseId }) =
                         >
                           <path
                             fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586l-3.293-3.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
                             clipRule="evenodd"
                           />
                         </svg>
