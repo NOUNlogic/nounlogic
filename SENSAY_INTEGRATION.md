@@ -85,4 +85,4 @@ This integration transforms how students learn by:
 
 ## Demo
 
-[Link to demo video]
+[Live app uri](https://nounlogic.top/)
