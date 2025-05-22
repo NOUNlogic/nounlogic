@@ -97,7 +97,7 @@ const IntegrationsClient = () => {
                     variant="primary"
                     className="w-full mt-2"
                     onClick={() => alert('Integration details coming soon!')}
-                  ></Button>
+                  >
                     View Integration
                   </Button>
                 </CardContent>
