@@ -97,7 +97,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       
       <aside 
         className={`bg-slate-900 text-white transition-all duration-300 ease-in-out fixed h-screen overflow-y-auto z-30
-          ${isOpen ? "left-0 w-64" : "-left-16 md:left-0 md:w-20"} 
+          ${isOpen ? "left-0 w-64" : "-left-64 md:left-0 md:w-20"} 
           shadow-xl border-r border-slate-800`}
       >
         {/* Logo section */}

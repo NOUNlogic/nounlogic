@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@import "../styles/mobile.css";
 
 @tailwind base;
 @tailwind components;
@@ -782,4 +783,139 @@ body {
 
 .hover-card:hover::before {
   opacity: 1;
+}
+
+/* Mobile responsive utilities and bottom bar styles */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Enhanced mobile touch targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Mobile-specific animations */
+@keyframes slideUpFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-from-bottom {
+  animation: slideUpFromBottom 0.3s ease-out;
+}
+
+/* Bottom navigation specific styles */
+.bottom-nav-item {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-indicator {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+  border-radius: 0 0 4px 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.bottom-nav-item.active .bottom-nav-indicator {
+  opacity: 1;
+}
+
+/* Mobile overlay improvements */
+.mobile-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  .responsive-text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .responsive-text-xl {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  
+  .responsive-text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+/* Mobile card improvements */
+@media (max-width: 768px) {
+  .mobile-card {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .mobile-card:first-child {
+    border-top: none;
+  }
+  
+  .mobile-card:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Enhanced mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Mobile-specific button styles */
+.mobile-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+/* Improved mobile form inputs */
+.mobile-input {
+  padding: 1rem;
+  font-size: 16px; /* Prevents zoom on iOS */
+  border-radius: 12px;
+  min-height: 48px;
+}
+
+/* Mobile navigation animations */
+@keyframes mobileNavSlide {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-nav-enter {
+  animation: mobileNavSlide 0.3s ease-out;
 }

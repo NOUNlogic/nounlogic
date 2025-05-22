@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import MobileBottomBar from './MobileBottomBar';
 import Layout from './Layout';
 
 interface MainLayoutProps {
@@ -47,6 +48,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <Layout>
       <div className="flex min-h-screen bg-background">
+        {/* Desktop Sidebar */}
         <Sidebar isOpen={sidebarExpanded} toggleSidebar={toggleSidebar} />
         
         <div className={`flex-1 transition-all duration-300 ${
@@ -54,14 +56,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }`}>
           <Topbar toggleSidebar={toggleSidebar} />
           
-          <main className="min-h-[calc(100vh-4rem)]">
-            {children}
+          <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">
+            <div className="p-4 md:p-6">
+              {children}
+            </div>
           </main>
           
-          <footer className="border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
+          <footer className="hidden md:block border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
             <p>© {new Date().getFullYear()} NounLogic Learning Management System. All rights reserved.</p>
           </footer>
         </div>
+        
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomBar />
       </div>
     </Layout>
   );
