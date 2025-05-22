@@ -6,9 +6,11 @@ import Link from 'next/link';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/CardComponents';
+import { useAuth } from '@/app/providers';
 
 const LoginClient = () => {
   const router = useRouter();
+  const { login, loginWithWallet, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'email' | 'wallet'>('email');
   const [email, setEmail] = useState('');
@@ -28,10 +30,7 @@ const LoginClient = () => {
       setError('');
       
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Successful login
+        await login(email, password);
         router.push('/dashboard');
       } catch (err) {
         setError('Invalid email or password');
@@ -43,10 +42,10 @@ const LoginClient = () => {
       try {
         setIsLoading(true);
         
-        // Simulate wallet connection
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Mock wallet address for demo
+        const mockWalletAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+        await loginWithWallet(mockWalletAddress);
         
-        // Successful login
         router.push('/dashboard');
       } catch (err) {
         setError('Failed to connect wallet');
