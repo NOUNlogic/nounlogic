@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { SensayProvider } from '@/lib/sensay/context';
 import { account, appwriteAuth } from '@/lib/appwrite';
 
 interface UserProfile {
@@ -113,9 +112,7 @@ interface AppProvidersProps {
 export default function AppProviders({ children }: AppProvidersProps) {
   return (
     <AuthProvider>
-      <SensayProvider>
-        {children}
-      </SensayProvider>
+      {children}
     </AuthProvider>
   );
 }
