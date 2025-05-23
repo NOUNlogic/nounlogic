@@ -16,63 +16,26 @@ const getApiKey = () => {
 const initializeSensaySession = async (apiKey: string) => {
   console.log('Starting Sensay session initialization...');
   try {
-    // 1. Org-only client
-    console.log('Step 1: Creating org-only client...');
-    const orgClient = new SensayAPI({
-      HEADERS: {
-        'X-ORGANIZATION-SECRET': apiKey
-      }
-    });
+    // Based on endpoints.md, X-USER-ID should be the same as the API key
+    const userId = apiKey;
     
-    // 2. Check user
-    console.log('Step 2: Checking if user exists...');
-    let userExists = false;
-    try {
-      await orgClient.users.getV1Users(SAMPLE_USER_ID);
-      userExists = true;
-      console.log('User exists');
-    } catch (e) {
-      console.log('User does not exist, will create');
-    }
-    
-    // 3. Create user if needed
-    if (!userExists) {
-      console.log('Step 3: Creating user...');
-      try {
-        await orgClient.users.postV1Users(API_VERSION, {
-          id: SAMPLE_USER_ID,
-          email: `${SAMPLE_USER_ID}@example.com`,
-          name: 'Sample User'
-        });
-        console.log('User created successfully');
-      } catch (error: any) {
-        // If user already exists (409 conflict), that's okay - continue
-        if (error.status === 409) {
-          console.log('User already exists (409), continuing...');
-        } else {
-          console.error('Error creating user:', error);
-          throw error;
-        }
-      }
-    }
-    
-    // 4. User-auth client
-    console.log('Step 4: Creating user-authenticated client...');
+    // 1. Create user-authenticated client directly
+    console.log('Step 1: Creating user-authenticated client...');
     const client = new SensayAPI({
       HEADERS: {
         'X-ORGANIZATION-SECRET': apiKey,
-        'X-USER-ID': SAMPLE_USER_ID
+        'X-USER-ID': userId
       }
     });
     
-    // 5. Find or create replica
-    console.log('Step 5: Looking for existing replica...');
+    // 2. Find or create replica
+    console.log('Step 2: Looking for existing replica...');
     
-    // Search for replica by slug with pagination and ownership filter
+    // Search for replica by slug
     let replicas = await client.replicas.getV1Replicas(
-      SAMPLE_USER_ID, // ownerUuid filter
+      undefined, // ownerUuid
       1, // pageIndex
-      100, // pageSize (increase to capture more results)
+      100, // pageSize
       SAMPLE_REPLICA_SLUG // slug filter
     );
     
@@ -87,25 +50,6 @@ const initializeSensaySession = async (apiKey: string) => {
       }
     }
     
-    // If not found with owner filter, try without owner filter
-    if (!replicaId) {
-      console.log('Searching without owner filter...');
-      replicas = await client.replicas.getV1Replicas(
-        undefined, // no owner filter
-        1, // pageIndex
-        100, // pageSize
-        SAMPLE_REPLICA_SLUG // slug filter
-      );
-      
-      if (replicas.items && replicas.items.length > 0) {
-        const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
-        if (sampleReplica) {
-          replicaId = sampleReplica.uuid;
-          console.log(`Found existing replica (no owner filter): ${replicaId}`);
-        }
-      }
-    }
-    
     // Create the sample replica if it doesn't exist
     if (!replicaId) {
       console.log('Creating new replica...');
@@ -115,7 +59,7 @@ const initializeSensaySession = async (apiKey: string) => {
           shortDescription: 'A sample replica for demonstration',
           greeting: "Hello, I'm the sample replica. How can I help you today?",
           slug: SAMPLE_REPLICA_SLUG,
-          ownerID: SAMPLE_USER_ID,
+          ownerID: userId, // Use the API key as owner ID
           llm: {
             model: 'claude-3-7-sonnet-latest',
             memoryMode: 'prompt-caching',
@@ -126,14 +70,13 @@ const initializeSensaySession = async (apiKey: string) => {
         console.log(`Created new replica: ${replicaId}`);
       } catch (error: any) {
         if (error.status === 409) {
-          console.log('Replica already exists (409), final search attempt...');
+          console.log('Replica already exists (409), searching again...');
           
-          // Final attempt: search all replicas without filters
+          // Try to find it again without filters
           replicas = await client.replicas.getV1Replicas();
           console.log(`Total replicas found: ${replicas.items?.length || 0}`);
           
           if (replicas.items && replicas.items.length > 0) {
-            // Log all replica slugs for debugging
             console.log('All replica slugs:', replicas.items.map((r: any) => r.slug));
             
             const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
@@ -144,7 +87,7 @@ const initializeSensaySession = async (apiKey: string) => {
           }
           
           if (!replicaId) {
-            // Instead of throwing an error, use a unique slug
+            // Use a unique slug as fallback
             const uniqueSlug = `${SAMPLE_REPLICA_SLUG}-${Date.now()}`;
             console.log(`Creating replica with unique slug: ${uniqueSlug}`);
             
@@ -153,7 +96,7 @@ const initializeSensaySession = async (apiKey: string) => {
               shortDescription: 'A sample replica for demonstration',
               greeting: "Hello, I'm the sample replica. How can I help you today?",
               slug: uniqueSlug,
-              ownerID: SAMPLE_USER_ID,
+              ownerID: userId,
               llm: {
                 model: 'claude-3-7-sonnet-latest',
                 memoryMode: 'prompt-caching',
