@@ -22,36 +22,60 @@ const initializeSensaySession = async (apiKey: string) => {
   }
   
   try {
-    // Based on endpoints.md and docs, use API key for both headers
-    console.log('Creating authenticated client...');
+    // 1. Initialize organization-only client (no user authentication)
+    console.log('Step 1: Creating organization-only client...');
+    const orgClient = new SensayAPI({
+      HEADERS: {
+        'X-ORGANIZATION-SECRET': apiKey
+      }
+    });
+
+    // 2. Check if sample user exists
+    console.log('Step 2: Checking if sample user exists...');
+    let userExists = false;
+    try {
+      await orgClient.users.getV1Users(SAMPLE_USER_ID);
+      userExists = true;
+      console.log('User exists');
+    } catch (error) {
+      console.log('User does not exist, will create');
+    }
+
+    // 3. Create user if needed
+    if (!userExists) {
+      console.log('Step 3: Creating user...');
+      await orgClient.users.postV1Users(API_VERSION, {
+        id: SAMPLE_USER_ID,
+        email: `${SAMPLE_USER_ID}@example.com`,
+        name: "Sample User"
+      });
+      console.log('User created successfully');
+    }
+
+    // 4. Initialize user-authenticated client for further operations
+    console.log('Step 4: Creating user-authenticated client...');
     const client = new SensayAPI({
       HEADERS: {
         'X-ORGANIZATION-SECRET': apiKey,
-        'X-USER-ID': apiKey
+        'X-USER-ID': SAMPLE_USER_ID
       }
     });
     
     // Test the connection
     console.log('Testing authentication...');
-    const testReplicas = await client.replicas.getV1Replicas(undefined, 1, 1);
+    const testReplicas = await client.replicas.getV1Replicas();
     console.log('Authentication successful, found', testReplicas.items?.length || 0, 'replicas');
     
-    // 2. Find or create replica
-    console.log('Step 2: Looking for existing replica...');
+    // 5. Find or create replica
+    console.log('Step 5: Looking for existing replica...');
     
-    // Search for replica by slug
-    let replicas = await client.replicas.getV1Replicas(
-      undefined, // ownerUuid
-      1, // pageIndex
-      100, // pageSize
-      SAMPLE_REPLICA_SLUG // slug filter
-    );
-    
+    // List replicas to find our sample replica
+    const replicas = await client.replicas.getV1Replicas();
     let replicaId;
     
     // Look for the sample replica by slug
     if (replicas.items && replicas.items.length > 0) {
-      const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
+      const sampleReplica = replicas.items.find((replica: any) => replica.slug === SAMPLE_REPLICA_SLUG);
       if (sampleReplica) {
         replicaId = sampleReplica.uuid;
         console.log(`Found existing replica: ${replicaId}`);
@@ -61,64 +85,20 @@ const initializeSensaySession = async (apiKey: string) => {
     // Create the sample replica if it doesn't exist
     if (!replicaId) {
       console.log('Creating new replica...');
-      try {
-        const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
-          name: 'Sample Replica',
-          shortDescription: 'A sample replica for demonstration',
-          greeting: "Hello, I'm the sample replica. How can I help you today?",
-          slug: SAMPLE_REPLICA_SLUG,
-          ownerID: apiKey, // Use the API key as owner ID
-          llm: {
-            model: 'claude-3-7-sonnet-latest',
-            memoryMode: 'prompt-caching',
-            systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
-          }
-        });
-        replicaId = newReplica.uuid;
-        console.log(`Created new replica: ${replicaId}`);
-      } catch (error: any) {
-        if (error.status === 409) {
-          console.log('Replica already exists (409), searching again...');
-          
-          // Try to find it again without filters
-          replicas = await client.replicas.getV1Replicas();
-          console.log(`Total replicas found: ${replicas.items?.length || 0}`);
-          
-          if (replicas.items && replicas.items.length > 0) {
-            console.log('All replica slugs:', replicas.items.map((r: any) => r.slug));
-            
-            const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
-            if (sampleReplica) {
-              replicaId = sampleReplica.uuid;
-              console.log(`Found existing replica after conflict: ${replicaId}`);
-            }
-          }
-          
-          if (!replicaId) {
-            // Use a unique slug as fallback
-            const uniqueSlug = `${SAMPLE_REPLICA_SLUG}-${Date.now()}`;
-            console.log(`Creating replica with unique slug: ${uniqueSlug}`);
-            
-            const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
-              name: 'Sample Replica',
-              shortDescription: 'A sample replica for demonstration',
-              greeting: "Hello, I'm the sample replica. How can I help you today?",
-              slug: uniqueSlug,
-              ownerID: apiKey,
-              llm: {
-                model: 'claude-3-7-sonnet-latest',
-                memoryMode: 'prompt-caching',
-                systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
-              }
-            });
-            replicaId = newReplica.uuid;
-            console.log(`Created replica with unique slug: ${replicaId}`);
-          }
-        } else {
-          console.error('Error creating replica:', error);
-          throw error;
+      const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+        name: "Sample Replica",
+        shortDescription: "A sample replica for demonstration",
+        greeting: "Hello, I'm the sample replica. How can I help you today?",
+        slug: SAMPLE_REPLICA_SLUG,
+        ownerID: SAMPLE_USER_ID,
+        llm: {
+          model: "claude-3-7-sonnet-latest",
+          memoryMode: "prompt-caching",
+          systemMessage: "You are a helpful AI assistant that provides clear and concise responses."
         }
-      }
+      });
+      replicaId = newReplica.uuid;
+      console.log(`Created new replica: ${replicaId}`);
     }
     
     console.log('Session initialization complete');
