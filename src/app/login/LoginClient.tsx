@@ -3,15 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/CardComponents';
+import { ThemedInput, ThemedButton, ThemedCard } from '@/components/ui';
 import { useAuth } from '@/app/providers';
+import { useTheme } from '@/lib/theme';
 import { AlertCircle, Mail, Lock, ArrowRight, Wallet } from 'lucide-react';
 
 const LoginClient = () => {
   const router = useRouter();
   const { login, isLoading: authLoading } = useAuth();
+  const { isDark } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'email' | 'wallet'>('email');
   const [email, setEmail] = useState('');
@@ -52,40 +52,69 @@ const LoginClient = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-4 overflow-hidden">
+    <div className={`min-h-screen flex items-center justify-center p-4 overflow-hidden transition-colors duration-300 ${
+      isDark 
+        ? 'bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+    }`}>
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-500/20 to-blue-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
-        <div className="absolute bottom-20 right-40 w-96 h-96 bg-gradient-to-tr from-indigo-500/10 to-pink-500/10 rounded-full filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+        <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full filter blur-3xl animate-pulse-slow ${
+          isDark 
+            ? 'bg-gradient-to-br from-purple-500/20 to-blue-600/20' 
+            : 'bg-gradient-to-br from-purple-300/30 to-blue-400/30'
+        }`}></div>
+        <div className={`absolute top-20 left-20 w-72 h-72 rounded-full filter blur-3xl animate-pulse-slow animation-delay-1000 ${
+          isDark 
+            ? 'bg-gradient-to-r from-blue-500/10 to-cyan-400/10' 
+            : 'bg-gradient-to-r from-blue-300/20 to-cyan-300/20'
+        }`}></div>
+        <div className={`absolute bottom-20 right-40 w-96 h-96 rounded-full filter blur-3xl animate-pulse-slow animation-delay-2000 ${
+          isDark 
+            ? 'bg-gradient-to-tr from-indigo-500/10 to-pink-500/10' 
+            : 'bg-gradient-to-tr from-indigo-300/20 to-pink-300/20'
+        }`}></div>
       </div>
       
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 w-full h-full bg-grid-pattern opacity-5"></div>
-      
       <div className="relative w-full max-w-md z-10">
-        <div className={`text-center mb-8 transition-all duration-700 ${showWelcomeAnimation ? 'transform translate-y-0 opacity-100' : 'transform -translate-y-4 opacity-100'}`}>
+        <div className={`text-center mb-8 transition-all duration-700 ${
+          showWelcomeAnimation ? 'transform translate-y-0 opacity-100' : 'transform -translate-y-4 opacity-100'
+        }`}>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30 animate-float">
               <span className="text-2xl font-bold text-white">NL</span>
             </div>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent drop-shadow-sm">
+          <h1 className={`text-4xl font-bold bg-gradient-to-r bg-clip-text text-transparent drop-shadow-sm ${
+            isDark 
+              ? 'from-white via-blue-100 to-blue-200' 
+              : 'from-gray-800 via-gray-700 to-gray-900'
+          }`}>
             NounLogic LMS
           </h1>
-          <p className="text-blue-100/80 mt-2 text-lg">
+          <p className={`mt-2 text-lg ${isDark ? 'text-blue-100/80' : 'text-gray-600'}`}>
             Global Learning Management System
           </p>
         </div>
         
-        <Card className="backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl shadow-black/10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/10 z-0 opacity-50"></div>
-          <CardHeader className="space-y-1 relative z-10">
-            <CardTitle className="text-2xl font-bold text-center bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Sign In</CardTitle>
-            <CardDescription className="text-center text-blue-100/80">
+        <ThemedCard 
+          variant={isDark ? 'glass' : 'default'}
+          className="shadow-2xl"
+          title={
+            <h2 className={`text-2xl font-bold text-center ${
+              isDark 
+                ? 'bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent' 
+                : 'text-foreground'
+            }`}>
+              Sign In
+            </h2>
+          }
+          subtitle={
+            <p className={`text-center ${isDark ? 'text-blue-100/80' : 'text-muted-foreground'}`}>
               Choose your preferred login method
-            </CardDescription>
-          </CardHeader>
+            </p>
+          }
+        >
           
           <CardContent>
             <div className="flex gap-2 mb-6 rounded-lg p-1 bg-white/5 backdrop-blur-sm border border-white/10">

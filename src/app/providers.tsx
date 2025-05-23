@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { account, appwriteAuth } from '@/lib/appwrite';
+import { ThemeProvider } from '@/lib/theme';
 
 interface UserProfile {
   name?: string;
@@ -111,8 +112,10 @@ interface AppProvidersProps {
 
 export default function AppProviders({ children }: AppProvidersProps) {
   return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
+    <ThemeProvider defaultMode="system">
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

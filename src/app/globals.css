@@ -6,6 +6,58 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Default light theme colors */
+    --color-primary: 262 83% 58%;
+    --color-primary-foreground: 0 0% 98%;
+    --color-secondary: 210 40% 96%;
+    --color-secondary-foreground: 222 84% 5%;
+    --color-accent: 210 40% 90%;
+    --color-accent-foreground: 222 84% 5%;
+    --color-background: 0 0% 100%;
+    --color-foreground: 222 84% 5%;
+    --color-card: 0 0% 100%;
+    --color-card-foreground: 222 84% 5%;
+    --color-muted: 210 40% 96%;
+    --color-muted-foreground: 215 16% 47%;
+    --color-border: 214 32% 91%;
+    --color-input: 214 32% 91%;
+    --color-ring: 262 83% 58%;
+    --color-destructive: 0 84% 60%;
+    --color-destructive-foreground: 0 0% 98%;
+    --color-success: 142 76% 36%;
+    --color-success-foreground: 0 0% 98%;
+    --color-warning: 38 92% 50%;
+    --color-warning-foreground: 0 0% 98%;
+  }
+
+  .dark {
+    /* Dark theme colors */
+    --color-primary: 262 83% 58%;
+    --color-primary-foreground: 210 40% 98%;
+    --color-secondary: 217 33% 17%;
+    --color-secondary-foreground: 210 40% 98%;
+    --color-accent: 217 33% 17%;
+    --color-accent-foreground: 210 40% 98%;
+    --color-background: 222 84% 5%;
+    --color-foreground: 210 40% 98%;
+    --color-card: 222 84% 5%;
+    --color-card-foreground: 210 40% 98%;
+    --color-muted: 217 33% 17%;
+    --color-muted-foreground: 215 20% 65%;
+    --color-border: 217 33% 17%;
+    --color-input: 217 33% 17%;
+    --color-ring: 262 83% 58%;
+    --color-destructive: 0 62% 30%;
+    --color-destructive-foreground: 0 0% 98%;
+    --color-success: 142 76% 36%;
+    --color-success-foreground: 0 0% 98%;
+    --color-warning: 38 92% 50%;
+    --color-warning-foreground: 0 0% 98%;
+  }
+}
+
 :root {
   --background: 210 40% 98%;
   --foreground: 222.2 84% 4.9%;
