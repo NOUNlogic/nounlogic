@@ -25,14 +25,27 @@ const initializeSensaySession = async (apiKey: string) => {
   try {
     await orgClient.users.getV1Users(SAMPLE_USER_ID);
     userExists = true;
-  } catch (e) {}
+    console.log('User exists');
+  } catch (e) {
+    console.log('User does not exist, will create');
+  }
   // 3. Create user if needed
   if (!userExists) {
-    await orgClient.users.postV1Users(API_VERSION, {
-      id: SAMPLE_USER_ID,
-      email: `${SAMPLE_USER_ID}@example.com`,
-      name: 'Sample User'
-    });
+    try {
+      await orgClient.users.postV1Users(API_VERSION, {
+        id: SAMPLE_USER_ID,
+        email: `${SAMPLE_USER_ID}@example.com`,
+        name: 'Sample User'
+      });
+      console.log('User created successfully');
+    } catch (error: any) {
+      // If user already exists (409 conflict), that's okay - continue
+      if (error.status === 409) {
+        console.log('User already exists (409), continuing...');
+      } else {
+        throw error;
+      }
+    }
   }
   // 4. User-auth client
   const client = new VerboseSensayAPI({
@@ -49,19 +62,40 @@ const initializeSensaySession = async (apiKey: string) => {
     if (sampleReplica) replicaId = sampleReplica.uuid;
   }
   if (!replicaId) {
-    const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
-      name: 'Sample Replica',
-      shortDescription: 'A sample replica for demonstration',
-      greeting: "Hello, I'm the sample replica. How can I help you today?",
-      slug: SAMPLE_REPLICA_SLUG,
-      ownerID: SAMPLE_USER_ID,
-      llm: {
-        model: 'claude-3-7-sonnet-latest',
-        memoryMode: 'prompt-caching',
-        systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
+    try {
+      const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+        name: 'Sample Replica',
+        shortDescription: 'A sample replica for demonstration',
+        greeting: "Hello, I'm the sample replica. How can I help you today?",
+        slug: SAMPLE_REPLICA_SLUG,
+        ownerID: SAMPLE_USER_ID,
+        llm: {
+          model: 'claude-3-7-sonnet-latest',
+          memoryMode: 'prompt-caching',
+          systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
+        }
+      });
+      replicaId = newReplica.uuid;
+      console.log('Replica created successfully');
+    } catch (error: any) {
+      // If replica already exists (409 conflict), try to find it again
+      if (error.status === 409) {
+        console.log('Replica already exists (409), searching again...');
+        replicas = await client.replicas.getV1Replicas();
+        if (replicas.items && replicas.items.length > 0) {
+          const sampleReplica = replicas.items.find(r => r.slug === SAMPLE_REPLICA_SLUG);
+          if (sampleReplica) {
+            replicaId = sampleReplica.uuid;
+          } else {
+            throw new Error('Replica exists but could not be found');
+          }
+        } else {
+          throw new Error('Replica exists but could not be found');
+        }
+      } else {
+        throw error;
       }
-    });
-    replicaId = newReplica.uuid;
+    }
   }
   return { client, replicaId };
 };
