@@ -13,6 +13,8 @@ import {
   LEARNING_COACH_CONFIG,
   TOPIC_CONFIGS 
 } from '@/lib/sensay/config';
+import { SensayAPI } from '@/sensay-sdk';
+import { SAMPLE_USER_ID, SAMPLE_REPLICA_SLUG, API_VERSION } from '@/constants/auth';
 
 // Educational topics for the AI assistant
 const TOPICS = Object.entries(TOPIC_CONFIGS).map(([id, config]) => ({
@@ -44,16 +46,79 @@ const ASSISTANT_ROLES = [
   }
 ];
 
+const getApiKey = () => {
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_SENSAY_API_KEY_SECRET || '';
+  }
+  return '';
+};
+
+const initializeSensaySession = async (apiKey: string) => {
+  // 1. Org-only client
+  const orgClient = new SensayAPI({
+    HEADERS: {
+      'X-ORGANIZATION-SECRET': apiKey
+    }
+  });
+  // 2. Check user
+  let userExists = false;
+  try {
+    await orgClient.users.getV1Users(SAMPLE_USER_ID);
+    userExists = true;
+  } catch (e) {}
+  // 3. Create user if needed
+  if (!userExists) {
+    await orgClient.users.postV1Users(API_VERSION, {
+      id: SAMPLE_USER_ID,
+      email: `${SAMPLE_USER_ID}@example.com`,
+      name: 'Sample User'
+    });
+  }
+  // 4. User-auth client
+  const client = new SensayAPI({
+    HEADERS: {
+      'X-ORGANIZATION-SECRET': apiKey,
+      'X-USER-ID': SAMPLE_USER_ID
+    }
+  });
+  // 5. Find or create replica
+  let replicas = await client.replicas.getV1Replicas();
+  let replicaId;
+  if (replicas.items && replicas.items.length > 0) {
+    const sampleReplica = replicas.items.find(r => r.slug === SAMPLE_REPLICA_SLUG);
+    if (sampleReplica) replicaId = sampleReplica.uuid;
+  }
+  if (!replicaId) {
+    const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+      name: 'Sample Replica',
+      shortDescription: 'A sample replica for demonstration',
+      greeting: "Hello, I'm the sample replica. How can I help you today?",
+      slug: SAMPLE_REPLICA_SLUG,
+      ownerID: SAMPLE_USER_ID,
+      llm: {
+        model: 'claude-3-7-sonnet-latest',
+        memoryMode: 'prompt-caching',
+        systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
+      }
+    });
+    replicaId = newReplica.uuid;
+  }
+  return { client, replicaId };
+};
+
 const AIClient = () => {
   const [selectedRole, setSelectedRole] = useState(ASSISTANT_ROLES[0].id);
   const [isConfiguring, setIsConfiguring] = useState(true);
+  const [apiKey, setApiKey] = useState(getApiKey());
+  const [sensayClient, setSensayClient] = useState<any>(null);
+  const [replicaId, setReplicaId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
-    messages,
     sendMessage,
-    isLoading,
-    setIsLoading,
-    isReady,
     initialize
   } = useSensayEducation({
     role: selectedRole as any,
@@ -62,15 +127,20 @@ const AIClient = () => {
 
   // Auto-initialize on component mount
   useEffect(() => {
-    if (!isReady && !isLoading) {
-      // This will call initializeApi() internally in useSensayEducation
-      initialize().catch(err => {
-        console.error("Failed to initialize Sensay:", err);
-        // Show a user-friendly error message
-        alert("Failed to initialize AI assistant. Please check your API key and try again.");
-      });
+    if (!isReady && apiKey) {
+      setIsLoading(true);
+      initializeSensaySession(apiKey)
+        .then(({ client, replicaId }) => {
+          setSensayClient(client);
+          setReplicaId(replicaId);
+          setIsReady(true);
+        })
+        .catch((err) => {
+          setError('Failed to initialize Sensay: ' + (err?.message || err));
+        })
+        .finally(() => setIsLoading(false));
     }
-  }, [isReady, isLoading, initialize]);
+  }, [apiKey, isReady]);
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
@@ -105,7 +175,25 @@ const AIClient = () => {
   };
 
   const handleSendMessage = async (message: string) => {
-    await sendMessage(message);
+    if (!sensayClient || !replicaId) return;
+    setIsLoading(true);
+    setMessages((prev) => [...prev, { role: 'user', content: message }]);
+    try {
+      const response = await sensayClient.chatCompletions.postV1ReplicasChatCompletions(
+        replicaId,
+        API_VERSION,
+        {
+          content: message,
+          source: 'web',
+          skip_chat_history: false
+        }
+      );
+      setMessages((prev) => [...prev, { role: 'assistant', content: response.content }]);
+    } catch (err: any) {
+      setError('Failed to send message: ' + (err?.message || err));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResetChat = () => {
