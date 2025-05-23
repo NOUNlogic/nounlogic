@@ -55,47 +55,36 @@ const initializeSensaySession = async (apiKey: string) => {
     }
   });
   // 5. Find or create replica
+  console.log('Step 5: Looking for existing replica...');
   let replicas = await client.replicas.getV1Replicas();
   let replicaId;
+  
+  // Look for the sample replica by slug
   if (replicas.items && replicas.items.length > 0) {
     const sampleReplica = replicas.items.find(r => r.slug === SAMPLE_REPLICA_SLUG);
-    if (sampleReplica) replicaId = sampleReplica.uuid;
-  }
-  if (!replicaId) {
-    try {
-      const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
-        name: 'Sample Replica',
-        shortDescription: 'A sample replica for demonstration',
-        greeting: "Hello, I'm the sample replica. How can I help you today?",
-        slug: SAMPLE_REPLICA_SLUG,
-        ownerID: SAMPLE_USER_ID,
-        llm: {
-          model: 'claude-3-7-sonnet-latest',
-          memoryMode: 'prompt-caching',
-          systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
-        }
-      });
-      replicaId = newReplica.uuid;
-      console.log('Replica created successfully');
-    } catch (error: any) {
-      // If replica already exists (409 conflict), try to find it again
-      if (error.status === 409) {
-        console.log('Replica already exists (409), searching again...');
-        replicas = await client.replicas.getV1Replicas();
-        if (replicas.items && replicas.items.length > 0) {
-          const sampleReplica = replicas.items.find(r => r.slug === SAMPLE_REPLICA_SLUG);
-          if (sampleReplica) {
-            replicaId = sampleReplica.uuid;
-          } else {
-            throw new Error('Replica exists but could not be found');
-          }
-        } else {
-          throw new Error('Replica exists but could not be found');
-        }
-      } else {
-        throw error;
-      }
+    if (sampleReplica) {
+      replicaId = sampleReplica.uuid;
+      console.log(`Found existing replica: ${replicaId}`);
     }
+  }
+  
+  // Create the sample replica if it doesn't exist
+  if (!replicaId) {
+    console.log('Creating new replica...');
+    const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+      name: 'Sample Replica',
+      shortDescription: 'A sample replica for demonstration',
+      greeting: "Hello, I'm the sample replica. How can I help you today?",
+      slug: SAMPLE_REPLICA_SLUG,
+      ownerID: SAMPLE_USER_ID,
+      llm: {
+        model: 'claude-3-7-sonnet-latest',
+        memoryMode: 'prompt-caching',
+        systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
+      }
+    });
+    replicaId = newReplica.uuid;
+    console.log(`Created new replica: ${replicaId}`);
   }
   return { client, replicaId };
 };
