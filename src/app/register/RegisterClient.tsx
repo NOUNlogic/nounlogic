@@ -300,34 +300,60 @@ const RegisterClient = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background/80 to-background p-4 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-4 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-500/20 to-blue-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-500/10 to-cyan-400/10 rounded-full filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
+        <div className="absolute bottom-20 right-40 w-96 h-96 bg-gradient-to-tr from-indigo-500/10 to-pink-500/10 rounded-full filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+      </div>
+      
+      {/* Subtle grid pattern */}
       <div className="absolute inset-0 w-full h-full bg-grid-pattern opacity-5"></div>
       
       <div className="relative w-full max-w-md z-10">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30 animate-float">
+              <span className="text-2xl font-bold text-white">NL</span>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent drop-shadow-sm">
             Create an Account
           </h1>
-          <p className="text-muted-foreground mt-2 text-lg">
+          <p className="text-blue-100/80 mt-2 text-lg">
             Join NounLogic Learning Management System
           </p>
         </div>
         
-        <Card className="shadow-xl border-opacity-30 backdrop-blur-sm bg-card/95">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Register</CardTitle>
-            <CardDescription className="text-center">
+        <Card className="backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl shadow-black/10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/10 z-0 opacity-50"></div>
+          <CardHeader className="relative z-10">
+            <CardTitle className="text-2xl text-center bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Register</CardTitle>
+            <CardDescription className="text-center text-blue-100/80">
               {formStep === 1 ? 'Start by creating your account' : 'Complete your profile information'}
             </CardDescription>
             
             {/* Progress indicator */}
             <div className="w-full flex items-center justify-center mt-4">
               <div className="w-2/3 flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
-                  1
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  formStep >= 1 
+                    ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-sm' 
+                    : 'bg-secondary/50 text-secondary-foreground'
+                }`}>
+                  {formStep > 1 ? <CheckCircle size={16} /> : '1'}
                 </div>
-                <div className={`flex-1 h-1 ${formStep >= 2 ? 'bg-primary' : 'bg-secondary'}`}></div>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${formStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+                <div className={`flex-1 h-1 transition-all duration-300 ${
+                  formStep >= 2 
+                    ? 'bg-gradient-to-r from-primary to-purple-600' 
+                    : 'bg-secondary/50'
+                }`}></div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  formStep >= 2 
+                    ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-sm' 
+                    : 'bg-secondary/50 text-secondary-foreground'
+                }`}>
                   2
                 </div>
               </div>
@@ -336,14 +362,14 @@ const RegisterClient = () => {
           
           <CardContent>
             {formStep === 1 && (
-              <div className="flex gap-2 mb-6 rounded-lg p-1 bg-secondary/50">
+              <div className="flex gap-2 mb-6 rounded-lg p-1 bg-white/5 backdrop-blur-sm border border-white/10">
                 <button
                   type="button"
                   onClick={() => setRegisterMethod('email')}
                   className={`flex-1 py-2.5 rounded-md font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
                     registerMethod === 'email'
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'bg-transparent hover:bg-secondary/80 text-secondary-foreground'
+                      ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-md'
+                      : 'bg-transparent hover:bg-white/10 text-white'
                   }`}
                 >
                   <Mail size={18} />
@@ -354,8 +380,8 @@ const RegisterClient = () => {
                   onClick={() => setRegisterMethod('wallet')}
                   className={`flex-1 py-2.5 rounded-md font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
                     registerMethod === 'wallet'
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'bg-transparent hover:bg-secondary/80 text-secondary-foreground'
+                      ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-md'
+                      : 'bg-transparent hover:bg-white/10 text-white'
                   }`}
                 >
                   <Wallet size={18} />
