@@ -67,7 +67,15 @@ const initializeSensaySession = async (apiKey: string) => {
     
     // 5. Find or create replica
     console.log('Step 5: Looking for existing replica...');
-    let replicas = await client.replicas.getV1Replicas();
+    
+    // Search for replica by slug with pagination and ownership filter
+    let replicas = await client.replicas.getV1Replicas(
+      SAMPLE_USER_ID, // ownerUuid filter
+      1, // pageIndex
+      100, // pageSize (increase to capture more results)
+      SAMPLE_REPLICA_SLUG // slug filter
+    );
+    
     let replicaId;
     
     // Look for the sample replica by slug
@@ -76,6 +84,25 @@ const initializeSensaySession = async (apiKey: string) => {
       if (sampleReplica) {
         replicaId = sampleReplica.uuid;
         console.log(`Found existing replica: ${replicaId}`);
+      }
+    }
+    
+    // If not found with owner filter, try without owner filter
+    if (!replicaId) {
+      console.log('Searching without owner filter...');
+      replicas = await client.replicas.getV1Replicas(
+        undefined, // no owner filter
+        1, // pageIndex
+        100, // pageSize
+        SAMPLE_REPLICA_SLUG // slug filter
+      );
+      
+      if (replicas.items && replicas.items.length > 0) {
+        const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
+        if (sampleReplica) {
+          replicaId = sampleReplica.uuid;
+          console.log(`Found existing replica (no owner filter): ${replicaId}`);
+        }
       }
     }
     
@@ -99,18 +126,42 @@ const initializeSensaySession = async (apiKey: string) => {
         console.log(`Created new replica: ${replicaId}`);
       } catch (error: any) {
         if (error.status === 409) {
-          console.log('Replica already exists (409), searching again...');
-          // Try to find it again
+          console.log('Replica already exists (409), final search attempt...');
+          
+          // Final attempt: search all replicas without filters
           replicas = await client.replicas.getV1Replicas();
+          console.log(`Total replicas found: ${replicas.items?.length || 0}`);
+          
           if (replicas.items && replicas.items.length > 0) {
+            // Log all replica slugs for debugging
+            console.log('All replica slugs:', replicas.items.map((r: any) => r.slug));
+            
             const sampleReplica = replicas.items.find((r: any) => r.slug === SAMPLE_REPLICA_SLUG);
             if (sampleReplica) {
               replicaId = sampleReplica.uuid;
               console.log(`Found existing replica after conflict: ${replicaId}`);
             }
           }
+          
           if (!replicaId) {
-            throw new Error('Replica creation failed: slug already exists but replica not found');
+            // Instead of throwing an error, use a unique slug
+            const uniqueSlug = `${SAMPLE_REPLICA_SLUG}-${Date.now()}`;
+            console.log(`Creating replica with unique slug: ${uniqueSlug}`);
+            
+            const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+              name: 'Sample Replica',
+              shortDescription: 'A sample replica for demonstration',
+              greeting: "Hello, I'm the sample replica. How can I help you today?",
+              slug: uniqueSlug,
+              ownerID: SAMPLE_USER_ID,
+              llm: {
+                model: 'claude-3-7-sonnet-latest',
+                memoryMode: 'prompt-caching',
+                systemMessage: 'You are a helpful AI assistant that provides clear and concise responses.'
+              }
+            });
+            replicaId = newReplica.uuid;
+            console.log(`Created replica with unique slug: ${replicaId}`);
           }
         } else {
           console.error('Error creating replica:', error);
