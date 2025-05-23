@@ -29,7 +29,7 @@ export class SensayAPI {
   private version: string;
 
   constructor(config: SensayAPIConfig) {
-    this.apiKey = config.apiKey;
+    this.apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY_SECRET;
     this.version = config.version || '2025-03-25';
     
     this.client = axios.create({

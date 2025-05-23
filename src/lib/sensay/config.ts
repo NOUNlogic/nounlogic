@@ -110,11 +110,11 @@ export const TOPIC_CONFIGS = {
 
 // Sensay API Configuration
 export const getSensayConfig = () => {
-  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY_SECRET;
   const apiVersion = process.env.NEXT_PUBLIC_SENSAY_API_VERSION || '2025-03-25';
   
   if (!apiKey || apiKey === 'your-sensay-api-key') {
-    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY in your environment variables.');
+    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY_SECRET in your environment variables.');
     return null;
   }
 
@@ -135,11 +135,11 @@ export const getSensayConfig = () => {
 
 // Initialize Sensay API client
 export const createSensayClient = () => {
-  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY_SECRET;
   const apiVersion = process.env.NEXT_PUBLIC_SENSAY_API_VERSION || '2025-03-25';
   
   if (!apiKey || apiKey === 'your-sensay-api-key') {
-    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY in your environment variables.');
+    console.warn('Sensay API key not configured. Please set NEXT_PUBLIC_SENSAY_API_KEY_SECRET in your environment variables.');
     return null;
   }
 

@@ -50,7 +50,7 @@ export const SensayProvider = ({ children }: SensayProviderProps) => {
     try {
       setIsLoading(true);
       setError(null);
-      const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_SENSAY_API_KEY_SECRET;
       if (!apiKey) throw new Error('Sensay API key is not configured');
       
       const sensayApi = new SensayAPI({ apiKey });
