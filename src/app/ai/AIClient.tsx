@@ -13,69 +13,28 @@ const getApiKey = () => {
   return '';
 };
 
-const getOrgId = () => {
-  if (typeof window !== 'undefined') {
-    return process.env.NEXT_PUBLIC_SENSAY_ORGANIZATION_ID || '';
-  }
-  return '';
-};
-
-const initializeSensaySession = async (apiKey: string, orgId: string) => {
+const initializeSensaySession = async (apiKey: string) => {
   console.log('Starting Sensay session initialization...');
   console.log('API Key length:', apiKey.length);
-  console.log('Org ID length:', orgId.length);
+  
+  if (!apiKey) {
+    throw new Error('No API key provided');
+  }
   
   try {
-    // Based on endpoints.md, try different authentication approaches
-    // First attempt: Use orgId as X-ORGANIZATION-SECRET and apiKey as X-USER-ID
-    console.log('Attempt 1: Using orgId as X-ORGANIZATION-SECRET, apiKey as X-USER-ID');
-    let client = new SensayAPI({
+    // Based on endpoints.md and docs, use API key for both headers
+    console.log('Creating authenticated client...');
+    const client = new SensayAPI({
       HEADERS: {
-        'X-ORGANIZATION-SECRET': orgId,
+        'X-ORGANIZATION-SECRET': apiKey,
         'X-USER-ID': apiKey
       }
     });
     
-    try {
-      // Test the connection by trying to list replicas
-      await client.replicas.getV1Replicas(undefined, 1, 1);
-      console.log('Authentication successful with orgId as secret');
-    } catch (error: any) {
-      if (error.status === 401) {
-        console.log('Attempt 1 failed, trying different approach...');
-        // Second attempt: Use apiKey as X-ORGANIZATION-SECRET and orgId as X-USER-ID
-        console.log('Attempt 2: Using apiKey as X-ORGANIZATION-SECRET, orgId as X-USER-ID');
-        client = new SensayAPI({
-          HEADERS: {
-            'X-ORGANIZATION-SECRET': apiKey,
-            'X-USER-ID': orgId
-          }
-        });
-        
-        try {
-          await client.replicas.getV1Replicas(undefined, 1, 1);
-          console.log('Authentication successful with apiKey as secret');
-        } catch (error2: any) {
-          if (error2.status === 401) {
-            console.log('Attempt 2 failed, trying apiKey for both...');
-            // Third attempt: Use apiKey for both (like in endpoints.md)
-            client = new SensayAPI({
-              HEADERS: {
-                'X-ORGANIZATION-SECRET': apiKey,
-                'X-USER-ID': apiKey
-              }
-            });
-            
-            await client.replicas.getV1Replicas(undefined, 1, 1);
-            console.log('Authentication successful with apiKey for both');
-          } else {
-            throw error2;
-          }
-        }
-      } else {
-        throw error;
-      }
-    }
+    // Test the connection
+    console.log('Testing authentication...');
+    const testReplicas = await client.replicas.getV1Replicas(undefined, 1, 1);
+    console.log('Authentication successful, found', testReplicas.items?.length || 0, 'replicas');
     
     // 2. Find or create replica
     console.log('Step 2: Looking for existing replica...');
@@ -172,7 +131,6 @@ const initializeSensaySession = async (apiKey: string, orgId: string) => {
 
 const AIClient = () => {
   const [apiKey] = useState(getApiKey());
-  const [orgId] = useState(getOrgId());
   const [sensayClient, setSensayClient] = useState<any>(null);
   const [replicaId, setReplicaId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -181,9 +139,9 @@ const AIClient = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isReady && apiKey && orgId) {
+    if (!isReady && apiKey) {
       setIsLoading(true);
-      initializeSensaySession(apiKey, orgId)
+      initializeSensaySession(apiKey)
         .then(({ client, replicaId }) => {
           setSensayClient(client);
           setReplicaId(replicaId);
@@ -194,7 +152,7 @@ const AIClient = () => {
         })
         .finally(() => setIsLoading(false));
     }
-  }, [apiKey, orgId, isReady]);
+  }, [apiKey, isReady]);
 
   const handleSendMessage = async (message: string) => {
     if (!sensayClient || !replicaId) return;
