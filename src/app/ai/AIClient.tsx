@@ -44,12 +44,22 @@ const initializeSensaySession = async (apiKey: string) => {
     // 3. Create user if needed
     if (!userExists) {
       console.log('Step 3: Creating user...');
-      await orgClient.users.postV1Users(API_VERSION, {
-        id: SAMPLE_USER_ID,
-        email: `${SAMPLE_USER_ID}@example.com`,
-        name: "Sample User"
-      });
-      console.log('User created successfully');
+      try {
+        await orgClient.users.postV1Users(API_VERSION, {
+          id: SAMPLE_USER_ID,
+          email: `${SAMPLE_USER_ID}@example.com`,
+          name: "Sample User"
+        });
+        console.log('User created successfully');
+      } catch (error: any) {
+        // If user already exists (409 conflict), that's okay - continue
+        if (error.status === 409 || error.message?.includes('Conflict')) {
+          console.log('User already exists (409 conflict), continuing...');
+        } else {
+          console.error('Error creating user:', error);
+          throw error;
+        }
+      }
     }
 
     // 4. Initialize user-authenticated client for further operations
@@ -85,20 +95,57 @@ const initializeSensaySession = async (apiKey: string) => {
     // Create the sample replica if it doesn't exist
     if (!replicaId) {
       console.log('Creating new replica...');
-      const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
-        name: "Sample Replica",
-        shortDescription: "A sample replica for demonstration",
-        greeting: "Hello, I'm the sample replica. How can I help you today?",
-        slug: SAMPLE_REPLICA_SLUG,
-        ownerID: SAMPLE_USER_ID,
-        llm: {
-          model: "claude-3-7-sonnet-latest",
-          memoryMode: "prompt-caching",
-          systemMessage: "You are a helpful AI assistant that provides clear and concise responses."
+      try {
+        const newReplica = await client.replicas.postV1Replicas(API_VERSION, {
+          name: "Sample Replica",
+          shortDescription: "A sample replica for demonstration",
+          greeting: "Hello, I'm the sample replica. How can I help you today?",
+          slug: SAMPLE_REPLICA_SLUG,
+          ownerID: SAMPLE_USER_ID,
+          llm: {
+            model: "claude-3-7-sonnet-latest",
+            memoryMode: "prompt-caching",
+            systemMessage: "You are a helpful AI assistant that provides clear and concise responses."
+          }
+        });
+        replicaId = newReplica.uuid;
+        console.log(`Created new replica: ${replicaId}`);
+      } catch (error: any) {
+        // If replica already exists (409 conflict), try to find it
+        if (error.status === 409 || error.message?.includes('Conflict')) {
+          console.log('Replica already exists (409 conflict), searching for it...');
+          // Search again for the replica
+          const conflictReplicas = await client.replicas.getV1Replicas();
+          if (conflictReplicas.items && conflictReplicas.items.length > 0) {
+            const existingReplica = conflictReplicas.items.find((replica: any) => replica.slug === SAMPLE_REPLICA_SLUG);
+            if (existingReplica) {
+              replicaId = existingReplica.uuid;
+              console.log(`Found existing replica after conflict: ${replicaId}`);
+            } else {
+              // If we still can't find it, create with a unique slug
+              const uniqueSlug = `${SAMPLE_REPLICA_SLUG}-${Date.now()}`;
+              console.log(`Creating replica with unique slug: ${uniqueSlug}`);
+              const uniqueReplica = await client.replicas.postV1Replicas(API_VERSION, {
+                name: "Sample Replica",
+                shortDescription: "A sample replica for demonstration",
+                greeting: "Hello, I'm the sample replica. How can I help you today?",
+                slug: uniqueSlug,
+                ownerID: SAMPLE_USER_ID,
+                llm: {
+                  model: "claude-3-7-sonnet-latest",
+                  memoryMode: "prompt-caching",
+                  systemMessage: "You are a helpful AI assistant that provides clear and concise responses."
+                }
+              });
+              replicaId = uniqueReplica.uuid;
+              console.log(`Created replica with unique slug: ${replicaId}`);
+            }
+          }
+        } else {
+          console.error('Error creating replica:', error);
+          throw error;
         }
-      });
-      replicaId = newReplica.uuid;
-      console.log(`Created new replica: ${replicaId}`);
+      }
     }
     
     console.log('Session initialization complete');
@@ -128,7 +175,7 @@ const AIClient = () => {
           setIsReady(true);
         })
         .catch((err) => {
-          setError('Failed to initialize Sensay: ' + (err?.message || err));
+          setError('Failed to initialize Sensay: ' + (err?.message || err?.toString() || 'Unknown error'));
         })
         .finally(() => setIsLoading(false));
     }
@@ -150,7 +197,7 @@ const AIClient = () => {
       );
       setMessages((prev) => [...prev, { role: 'assistant', content: response.content }]);
     } catch (err: any) {
-      setError('Failed to send message: ' + (err?.message || err));
+      setError('Failed to send message: ' + (err?.message || err?.toString() || 'Unknown error'));
     } finally {
       setIsLoading(false);
     }
