@@ -5,7 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/CardComponents';
 import Button from '@/components/ui/Button';
 import { ChatInterface } from '@/components/sensay/ChatComponents';
-import { useSensayEducation } from '@/lib/sensay/education';
+import { useSensayEducation } from '@/sensay/education';
 import { BrainIcon } from '@/components/ui/Icons';
 import { 
   TEACHING_ASSISTANT_CONFIG, 

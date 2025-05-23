@@ -1,9 +1,12 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { The_linked_accounts_of_the_user } from '../models/The_linked_accounts_of_the_user';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-
 export class UsersService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
-
     /**
      * Get the current user
      * Returns information about the current user.
@@ -26,16 +29,7 @@ export class UsersService {
          * The ID of the user
          */
         id: string;
-        linkedAccounts?: Array<{
-            /**
-             * The account ID
-             */
-            accountID: string;
-            /**
-             * The account type
-             */
-            accountType: 'discord' | 'telegram' | 'embed';
-        }>;
+        linkedAccounts?: The_linked_accounts_of_the_user;
     }> {
         return this.httpRequest.request({
             method: 'GET',
@@ -45,7 +39,89 @@ export class UsersService {
             },
         });
     }
-
+    /**
+     * Delete the current user
+     * This endpoint permanently deletes the currently authenticated user account, including all associated data. After deletion, the account cannot be recovered.
+     * @param xApiVersion
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteV1UsersMe(
+        xApiVersion: string = '2025-03-25',
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/v1/users/me',
+            headers: {
+                'X-API-Version': xApiVersion,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                415: `Unsupported Media Type`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Update the current user
+     * Update the currently logged in user.
+     * @param xApiVersion
+     * @param requestBody
+     * @returns any The updated User entity
+     * @throws ApiError
+     */
+    public putV1UsersMe(
+        xApiVersion: string = '2025-03-25',
+        requestBody?: {
+            /**
+             * The name of the user
+             */
+            name?: string;
+            /**
+             * The email address
+             */
+            email?: string;
+            /**
+             * The ID of the user
+             */
+            id: string;
+            linkedAccounts?: The_linked_accounts_of_the_user;
+        },
+    ): CancelablePromise<{
+        /**
+         * The name of the user
+         */
+        name?: string;
+        /**
+         * The email address
+         */
+        email?: string;
+        /**
+         * The ID of the user
+         */
+        id: string;
+        linkedAccounts?: The_linked_accounts_of_the_user;
+    }> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/v1/users/me',
+            headers: {
+                'X-API-Version': xApiVersion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `Unauthorized`,
+                404: `Not Found`,
+                409: `Linked account or email already exists or is invalid`,
+                415: `Unsupported Media Type`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
     /**
      * Create a user
      * Creates a new user.
@@ -69,16 +145,7 @@ export class UsersService {
              * The ID of the user
              */
             id?: string;
-            linkedAccounts?: Array<{
-                /**
-                 * The account ID
-                 */
-                accountID: string;
-                /**
-                 * The account type
-                 */
-                accountType: 'discord' | 'telegram' | 'embed';
-            }>;
+            linkedAccounts?: The_linked_accounts_of_the_user;
         },
     ): CancelablePromise<{
         /**
@@ -93,16 +160,7 @@ export class UsersService {
          * The ID of the user
          */
         id: string;
-        linkedAccounts?: Array<{
-            /**
-             * The account ID
-             */
-            accountID: string;
-            /**
-             * The account type
-             */
-            accountType: 'discord' | 'telegram' | 'embed';
-        }>;
+        linkedAccounts?: The_linked_accounts_of_the_user;
     }> {
         return this.httpRequest.request({
             method: 'POST',
@@ -117,7 +175,6 @@ export class UsersService {
             },
         });
     }
-
     /**
      * Get a user by ID
      * Returns information about the user with the specified ID.
@@ -142,16 +199,7 @@ export class UsersService {
          * The ID of the user
          */
         id: string;
-        linkedAccounts?: Array<{
-            /**
-             * The account ID
-             */
-            accountID: string;
-            /**
-             * The account type
-             */
-            accountType: 'discord' | 'telegram' | 'embed';
-        }>;
+        linkedAccounts?: The_linked_accounts_of_the_user;
     }> {
         return this.httpRequest.request({
             method: 'GET',

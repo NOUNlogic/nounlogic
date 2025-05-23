@@ -1,64 +1,22 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
 import type { replicaUUID_parameter } from '../models/replicaUUID_parameter';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-
-export class ChatCompletionsService {
+export class ExperimentalService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
-
-    /**
-     * Generate a completion
-     * Ask for a completion and stores the prompt in the chat history.
-     * @param replicaUuid
-     * @param xApiVersion
-     * @param requestBody
-     * @returns any List of chat messages had with a replica by the current user, including the completion
-     * @throws ApiError
-     */
-    public postV1ReplicasChatCompletions(
-        replicaUuid: replicaUUID_parameter,
-        xApiVersion: string = '2025-03-25',
-        requestBody?: {
-            /**
-             * The prompt to generate completions for, encoded as a string.
-             */
-            content: string;
-            /**
-             * When set to true, historical messages are not used in the context, and the message is not appended to the conversation history, thus it is excluded from all future chat context.
-             */
-            skip_chat_history?: boolean;
-            /**
-             * The place where the conversation is happening, which informs where the message should be saved in the chat history.
-             */
-            source?: 'discord' | 'telegram' | 'embed' | 'web' | 'telegram_autopilot';
-        },
-    ): CancelablePromise<{
-        success: boolean;
-        content: string;
-    }> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/v1/replicas/{replicaUUID}/chat/completions',
-            path: {
-                'replicaUUID': replicaUuid,
-            },
-            headers: {
-                'X-API-Version': xApiVersion,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
-                401: `Unauthorized`,
-                404: `Not Found`,
-                415: `Unsupported Media Type`,
-                500: `Internal Server Error`,
-            },
-        });
-    }
-
     /**
      * Generate a completion (OpenAI-compatible, non-streaming)
+     *
+     * > warn
+     * > Limited [OpenAI Chat Completions API](https://platform.openai.com/docs/api-reference/chat/create) compatibility.
+     * > Supports basic chat completion with standard message roles and JSON responses.
+     * > Not supported: OpenAI-style streaming, tool calls, stop sequences, logprobs, and most request parameters.
+     *
      * Creates a chat completion response from a list of messages comprising a conversation.
+     *
      * @param replicaUuid
      * @param requestBody
      * @returns any Chat completion response in OpenAI compatible format
@@ -92,6 +50,43 @@ export class ChatCompletionsService {
              * The place where the conversation is happening, which informs where the message should be saved in the chat history if `store` is true.
              */
             source?: 'discord' | 'embed' | 'web';
+            /**
+             * Discord information about the message
+             */
+            discord_data?: {
+                /**
+                 * Channel ID
+                 */
+                channel_id: string;
+                /**
+                 * Channel name
+                 */
+                channel_name: string;
+                /**
+                 * Author ID
+                 */
+                author_id: string;
+                /**
+                 * Author name
+                 */
+                author_name: string;
+                /**
+                 * Message ID
+                 */
+                message_id: string;
+                /**
+                 * Message creation timestamp
+                 */
+                created_at?: string;
+                /**
+                 * Server ID
+                 */
+                server_id?: string;
+                /**
+                 * Server name
+                 */
+                server_name?: string;
+            };
         },
     ): CancelablePromise<{
         /**
