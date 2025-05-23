@@ -23,7 +23,7 @@ const MobileBottomBar: React.FC = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-border/50 z-50">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/90 backdrop-blur-lg border-t border-border/50 z-50 shadow-lg shadow-black/5">
       <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
@@ -62,7 +62,7 @@ const MobileBottomBar: React.FC = () => {
               </span>
               
               {isActive && (
-                <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full"></div>
+                <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-primary to-purple-500 rounded-full"></div>
               )}
             </Link>
           );

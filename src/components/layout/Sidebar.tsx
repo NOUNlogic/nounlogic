@@ -56,12 +56,16 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                 href={item.href}
                 className={`flex items-center px-3 py-3 rounded-lg transition-all duration-200 group ${
                   isActive 
-                    ? "bg-primary/10 text-primary font-medium" 
+                    ? "bg-gradient-to-r from-primary/20 to-purple-500/10 text-primary font-medium backdrop-blur-sm" 
                     : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
                 }`}
                 title={!isOpen ? item.name : undefined}
               >
-                <div className={`flex items-center justify-center w-6 h-6 ${isActive ? "text-primary" : "text-slate-400 group-hover:text-primary-foreground"}`}>
+                <div className={`flex items-center justify-center w-6 h-6 ${
+                  isActive 
+                    ? "text-primary relative after:absolute after:inset-0 after:bg-primary after:blur-lg after:opacity-20" 
+                    : "text-slate-400 group-hover:text-white"
+                }`}>
                   <Icon className={`h-[18px] w-[18px] transition-transform ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
                 </div>
                 
@@ -72,7 +76,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                 )}
                 
                 {isActive && (
-                  <span className={`absolute right-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary ${isOpen ? "opacity-100" : "opacity-0"}`}></span>
+                  <span className={`absolute left-0 w-1 h-8 bg-gradient-to-b from-primary to-purple-500 rounded-r-full ${isOpen ? "opacity-100" : "opacity-0"}`}></span>
                 )}
               </Link>
             </li>
@@ -93,24 +97,24 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       )}
       
       <aside 
-        className={`bg-slate-900 text-white transition-all duration-300 ease-in-out fixed h-screen overflow-y-auto z-30
+        className={`bg-gradient-to-b from-slate-900 to-slate-950 text-white transition-all duration-300 ease-in-out fixed h-screen overflow-y-auto z-30
           ${isOpen ? "left-0 w-64" : "-left-64 md:left-0 md:w-20"} 
-          shadow-xl border-r border-slate-800`}
+          shadow-xl border-r border-slate-800/50`}
       >
         {/* Logo section */}
-        <div className="p-4 flex items-center justify-between h-16 border-b border-slate-800/50">
+        <div className="p-4 flex items-center justify-between h-16 border-b border-slate-700/30 bg-slate-900/50 backdrop-blur-sm">
           <Link href="/" className="flex items-center">
             {isOpen ? (
               <div className="flex items-center">
-                <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center mr-2">
+                <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mr-2 shadow-lg shadow-purple-500/20">
                   <span className="text-lg font-bold text-white">NL</span>
                 </div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                <h1 className="text-lg font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
                   NounLogic
                 </h1>
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center mx-auto">
+              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mx-auto shadow-lg shadow-purple-500/20 hover:scale-105 transition-transform">
                 <span className="text-lg font-bold text-white">NL</span>
               </div>
             )}
@@ -119,12 +123,12 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           {/* Toggle button visible on desktop */}
           <button 
             onClick={toggleSidebar} 
-            className="hidden md:flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 transition-colors"
+            className="hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-slate-800/80 hover:bg-slate-700 transition-colors border border-slate-700/50 shadow-inner"
           >
             {isOpen ? (
-              <ChevronLeft size={14} />
+              <ChevronLeft size={14} className="text-blue-100" />
             ) : (
-              <ChevronRight size={14} />
+              <ChevronRight size={14} className="text-blue-100" />
             )}
           </button>
         </div>
