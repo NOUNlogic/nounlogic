@@ -3,44 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { ChatInterface } from '@/components/sensay/ChatComponents';
-import { 
-  TEACHING_ASSISTANT_CONFIG, 
-  SUBJECT_EXPERT_CONFIG, 
-  LEARNING_COACH_CONFIG,
-  TOPIC_CONFIGS 
-} from '@/lib/sensay/config';
 import { VerboseSensayAPI } from '@/api-debug';
 import { SAMPLE_USER_ID, SAMPLE_REPLICA_SLUG, API_VERSION } from '@/constants/auth';
-
-// Educational topics for the AI assistant
-const TOPICS = Object.entries(TOPIC_CONFIGS).map(([id, config]) => ({
-  id,
-  name: config.name,
-  prompt: config.prompt,
-  description: config.description
-}));
-
-// Different AI assistant roles
-const ASSISTANT_ROLES = [
-  { 
-    id: 'TEACHING_ASSISTANT', 
-    name: TEACHING_ASSISTANT_CONFIG.name, 
-    description: TEACHING_ASSISTANT_CONFIG.description,
-    icon: 'teacher'
-  },
-  { 
-    id: 'SUBJECT_EXPERT', 
-    name: SUBJECT_EXPERT_CONFIG.name, 
-    description: SUBJECT_EXPERT_CONFIG.description,
-    icon: 'expert'
-  },
-  { 
-    id: 'LEARNING_COACH', 
-    name: LEARNING_COACH_CONFIG.name, 
-    description: LEARNING_COACH_CONFIG.description,
-    icon: 'coach'
-  }
-];
 
 const getApiKey = () => {
   if (typeof window !== 'undefined') {
