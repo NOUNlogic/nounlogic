@@ -1,0 +1,81 @@
+import { Client, Databases, Storage, Account, ID, Query } from 'appwrite';
+
+// Initialize Appwrite client
+const client = new Client();
+
+client
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+
+// Export services
+export const appwriteClient = client;
+export const appwriteAccount = new Account(client);
+export const appwriteDatabases = new Databases(client);
+export const appwriteStorage = new Storage(client);
+export { ID, Query };
+
+// Database IDs from environment
+export const DATABASE_IDS = {
+  CORE: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_CORE_ID!,
+  USERS: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_USERS_ID!,
+  COURSES: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_COURSES_ID!,
+  INSTITUTIONS: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_INSTITUTIONS_ID!,
+  AI: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_AI_ID!,
+  ANALYTICS: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ANALYTICS_ID!,
+  INTEGRATIONS: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_INTEGRATIONS_ID!,
+  WEB3: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_WEB3_ID!,
+} as const;
+
+// Collection IDs from environment
+export const COLLECTION_IDS = {
+  // Core collections
+  SETTINGS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SETTINGS_ID!,
+  ROLES: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ROLES_ID!,
+  
+  // Users collections
+  USERS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_USERS_ID!,
+  USER_PROFILES: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_USER_PROFILES_ID!,
+  
+  // Courses collections
+  COURSES: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_COURSES_ID!,
+  MODULES: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_MODULES_ID!,
+  LESSONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_LESSONS_ID!,
+  ENROLLMENTS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ENROLLMENTS_ID!,
+  ASSESSMENTS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ASSESSMENTS_ID!,
+  SUBMISSIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_SUBMISSIONS_ID!,
+  
+  // Institutions collections
+  INSTITUTIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_INSTITUTIONS_ID!,
+  INSTITUTION_INTEGRATIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_INSTITUTION_INTEGRATIONS_ID!,
+  
+  // AI collections
+  AI_MODELS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_AI_MODELS_ID!,
+  AI_RECOMMENDATIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_AI_RECOMMENDATIONS_ID!,
+  
+  // Analytics collections
+  EVENTS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EVENTS_ID!,
+  METRICS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_METRICS_ID!,
+  
+  // Integrations collections
+  EXTERNAL_INTEGRATIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_EXTERNAL_INTEGRATIONS_ID!,
+  
+  // Web3 collections
+  WALLETS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_WALLETS_ID!,
+  TRANSACTIONS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_TRANSACTIONS_ID!,
+  CERTIFICATES: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_CERTIFICATES_ID!,
+  NFT_CONTRACTS: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_NFT_CONTRACTS_ID!,
+} as const;
+
+// Storage IDs from environment
+export const STORAGE_IDS = {
+  AVATARS: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_AVATARS_ID!,
+  COURSE_MEDIA: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_COURSE_MEDIA_ID!,
+  CERTIFICATES: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_CERTIFICATES_ID!,
+} as const;
+
+// Feature flags from environment
+export const FEATURE_FLAGS = {
+  WEB3_ENABLED: process.env.NEXT_PUBLIC_ENABLE_WEB3 === 'true',
+  AI_FEATURES_ENABLED: process.env.NEXT_PUBLIC_ENABLE_AI_FEATURES === 'true',
+  ANALYTICS_ENABLED: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true',
+} as const;

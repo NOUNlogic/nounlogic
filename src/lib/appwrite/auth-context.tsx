@@ -1,11 +1,14 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { appwriteAccount } from './client';
+import { appwriteAccount, ID } from './client';
+import { usersService, analyticsService, FEATURE_FLAGS } from './services';
+import type { User as DatabaseUser } from '@/types/database';
 
 interface AppwriteUser {
   $id: string;
   email: string;
   name?: string;
+  databaseUser?: DatabaseUser;
 }
 
 interface AppwriteAuthContextType {
@@ -33,7 +36,31 @@ export const AppwriteAuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const account = await appwriteAccount.get();
-      setUser(account);
+      
+      // Try to get database user info if available
+      let databaseUser = null;
+      try {
+        const userResponse = await usersService.getUserById(account.$id);
+        databaseUser = userResponse;
+      } catch (error) {
+        // User might not exist in database yet, that's okay
+        console.log('Database user not found, will create on next login');
+      }
+      
+      setUser({ ...account, databaseUser });
+      
+      // Track login event if analytics enabled
+      if (FEATURE_FLAGS.ANALYTICS_ENABLED) {
+        try {
+          await analyticsService.createEvent({
+            user_id: account.$id,
+            type: 'user_session_start',
+            data: JSON.stringify({ timestamp: new Date().toISOString() })
+          });
+        } catch (error) {
+          console.log('Analytics tracking failed:', error);
+        }
+      }
     } catch {
       setUser(null);
     } finally {

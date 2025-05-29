@@ -8,44 +8,7 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useAppwriteAuth } from "@/lib/appwrite/auth-context";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-// Mock data for featured courses
-const featuredCourses = [
-  {
-    id: "1",
-    title: "Introduction to Blockchain",
-    description: "Learn the fundamentals of blockchain technology",
-    rating: 4.8,
-    students: 1248,
-    institution: "Blockchain Academy",
-    gradient: "from-blue-500 to-purple-600"
-  },
-  {
-    id: "2", 
-    title: "Smart Contract Development",
-    description: "Build secure and efficient smart contracts",
-    rating: 4.7,
-    students: 876,
-    institution: "Crypto Institute",
-    gradient: "from-emerald-500 to-teal-600"
-  },
-  {
-    id: "3",
-    title: "Web3 Integration",
-    description: "Connect your applications to blockchain networks",
-    rating: 4.9,
-    students: 654,
-    institution: "Tech University",
-    gradient: "from-orange-500 to-pink-600"
-  }
-];
-
-const achievements = [
-  { icon: BookOpen, count: "100+", label: "Courses", color: "text-blue-500" },
-  { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500" },
-  { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500" },
-  { icon: Building, count: "15+", label: "Institutions", color: "text-purple-500" }
-];
+import { useCourses, useInstitutions, useAnalytics } from "@/hooks/useDatabase";
 
 // Advanced animation variants
 const heroVariants = {
@@ -86,6 +49,11 @@ export default function HomeClient() {
   const [isLoaded, setIsLoaded] = useState(false);
   const { scrollY } = useScroll();
   
+  // Database hooks
+  const { courses, loading: coursesLoading } = useCourses();
+  const { institutions, loading: institutionsLoading } = useInstitutions();
+  const { trackEvent } = useAnalytics();
+  
   // Parallax effects
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, -100]);
@@ -95,6 +63,53 @@ export default function HomeClient() {
   const springConfig = { damping: 25, stiffness: 120 };
   const x = useSpring(mousePosition.x, springConfig);
   const y = useSpring(mousePosition.y, springConfig);
+
+  // Featured courses - use real data or fallback to mock data
+  const featuredCourses = courses.length > 0 ? courses.slice(0, 3).map(course => ({
+    id: course.$id,
+    title: course.title,
+    description: course.description,
+    rating: 4.8, // This could be calculated from submissions/reviews
+    students: 1248, // This could be calculated from enrollments
+    institution: institutions.find(inst => inst.institution_id === course.institution_id)?.name || "Unknown Institution",
+    gradient: ["from-blue-500 to-purple-600", "from-emerald-500 to-teal-600", "from-orange-500 to-pink-600"][Math.floor(Math.random() * 3)]
+  })) : [
+    {
+      id: "1",
+      title: "Introduction to Blockchain",
+      description: "Learn the fundamentals of blockchain technology",
+      rating: 4.8,
+      students: 1248,
+      institution: "Blockchain Academy",
+      gradient: "from-blue-500 to-purple-600"
+    },
+    {
+      id: "2", 
+      title: "Smart Contract Development",
+      description: "Build secure and efficient smart contracts",
+      rating: 4.7,
+      students: 876,
+      institution: "Crypto Institute",
+      gradient: "from-emerald-500 to-teal-600"
+    },
+    {
+      id: "3",
+      title: "Web3 Integration",
+      description: "Connect your applications to blockchain networks",
+      rating: 4.9,
+      students: 654,
+      institution: "Tech University",
+      gradient: "from-orange-500 to-pink-600"
+    }
+  ];
+
+  // Dynamic achievements based on real data
+  const achievements = [
+    { icon: BookOpen, count: `${courses.length || 100}+`, label: "Courses", color: "text-blue-500" },
+    { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500" },
+    { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500" },
+    { icon: Building, count: `${institutions.length || 15}+`, label: "Institutions", color: "text-purple-500" }
+  ];
 
   useEffect(() => {
     if (!loading && user) {
