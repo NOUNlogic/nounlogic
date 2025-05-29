@@ -1,5 +1,5 @@
-import HomeClient from './pageClient';
-import { AppwriteAuthProvider } from '@/lib/appwrite/auth-context';
+import HomeClient from './pageClientNew';
+import { AppwriteAuthProvider } from '@/lib/appwrite/auth-context-new';
 
 export default function Home() {
   return (

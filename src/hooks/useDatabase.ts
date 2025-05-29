@@ -1,18 +1,46 @@
-import { useState, useEffect } from 'react';
-import { 
-  coursesService, 
-  usersService, 
-  institutionsService, 
-  web3Service,
-  aiService,
-  analyticsService,
-  FEATURE_FLAGS
-} from '@/lib/appwrite/services';
-import type { Course, Enrollment, Institution, Certificate, AIRecommendation } from '@/types/database';
+'use client';
 
-// Courses hooks
-export const useCourses = () => {
-  const [courses, setCourses] = useState<any[]>([]);
+import { useState, useEffect } from 'react';
+import { appwriteDatabases } from '@/lib/appwrite/client';
+import { DATABASE_IDS, COLLECTION_IDS } from '@/lib/appwrite/database';
+import { Query } from 'appwrite';
+
+export interface Course {
+  $id: string;
+  title: string;
+  description: string;
+  institution_id: string;
+  creator_id: string;
+  metadata: string; // JSON string
+  nft_contract_address?: string;
+  $createdAt: string;
+  $updatedAt: string;
+}
+
+export interface Institution {
+  $id: string;
+  institution_id: string;
+  name: string;
+  type: string;
+  metadata: string; // JSON string
+  $createdAt: string;
+  $updatedAt: string;
+}
+
+export interface Enrollment {
+  $id: string;
+  enrollment_id: string;
+  user_id: string;
+  course_id: string;
+  status: string;
+  progress: string; // JSON string
+  certificate_token_id?: string;
+  $createdAt: string;
+  $updatedAt: string;
+}
+
+export function useCourses() {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,10 +48,15 @@ export const useCourses = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await coursesService.getCourses();
-        setCourses(response.documents || []);
+        const response = await appwriteDatabases.listDocuments(
+          DATABASE_IDS.COURSES,
+          COLLECTION_IDS.COURSES,
+          [Query.orderDesc('$createdAt')]
+        );
+        setCourses(response.documents as unknown as Course[]);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch courses');
+        console.error('Error fetching courses:', err);
       } finally {
         setLoading(false);
       }
@@ -32,71 +65,11 @@ export const useCourses = () => {
     fetchCourses();
   }, []);
 
-  return { courses, loading, error, refetch: () => window.location.reload() };
-};
+  return { courses, loading, error, refetch: () => setLoading(true) };
+}
 
-export const useCourse = (courseId: string) => {
-  const [course, setCourse] = useState<any>(null);
-  const [modules, setModules] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!courseId) return;
-
-    const fetchCourseData = async () => {
-      try {
-        setLoading(true);
-        const [courseResponse, modulesResponse] = await Promise.all([
-          coursesService.getCourseById(courseId),
-          coursesService.getModulesByCourse(courseId)
-        ]);
-        
-        setCourse(courseResponse);
-        setModules(modulesResponse.documents || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch course data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourseData();
-  }, [courseId]);
-
-  return { course, modules, loading, error };
-};
-
-// User enrollments hook
-export const useUserEnrollments = (userId: string) => {
-  const [enrollments, setEnrollments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchEnrollments = async () => {
-      try {
-        setLoading(true);
-        const response = await coursesService.getUserEnrollments(userId);
-        setEnrollments(response.documents || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch enrollments');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEnrollments();
-  }, [userId]);
-
-  return { enrollments, loading, error };
-};
-
-// Institutions hook
-export const useInstitutions = () => {
-  const [institutions, setInstitutions] = useState<any[]>([]);
+export function useInstitutions() {
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,10 +77,15 @@ export const useInstitutions = () => {
     const fetchInstitutions = async () => {
       try {
         setLoading(true);
-        const response = await institutionsService.getInstitutions();
-        setInstitutions(response.documents || []);
+        const response = await appwriteDatabases.listDocuments(
+          DATABASE_IDS.INSTITUTIONS,
+          COLLECTION_IDS.INSTITUTIONS,
+          [Query.orderDesc('$createdAt')]
+        );
+        setInstitutions(response.documents as unknown as Institution[]);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch institutions');
+        console.error('Error fetching institutions:', err);
       } finally {
         setLoading(false);
       }
@@ -116,113 +94,65 @@ export const useInstitutions = () => {
     fetchInstitutions();
   }, []);
 
-  return { institutions, loading, error };
-};
+  return { institutions, loading, error, refetch: () => setLoading(true) };
+}
 
-// Web3 hooks (only if Web3 is enabled)
-export const useUserWallet = (userId: string) => {
-  const [wallet, setWallet] = useState<any>(null);
+export function useEnrollments(userId?: string) {
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userId || !FEATURE_FLAGS.WEB3_ENABLED) {
-      setLoading(false);
-      return;
-    }
+    const fetchEnrollments = async () => {
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
-    const fetchWallet = async () => {
       try {
         setLoading(true);
-        const response = await web3Service.getUserWallet(userId);
-        setWallet(response.documents?.[0] || null);
+        const response = await appwriteDatabases.listDocuments(
+          DATABASE_IDS.COURSES,
+          COLLECTION_IDS.ENROLLMENTS,
+          [
+            Query.equal('user_id', userId),
+            Query.orderDesc('$createdAt')
+          ]
+        );
+        setEnrollments(response.documents as unknown as Enrollment[]);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch wallet');
+        setError(err.message || 'Failed to fetch enrollments');
+        console.error('Error fetching enrollments:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchWallet();
+    fetchEnrollments();
   }, [userId]);
 
-  return { wallet, loading, error };
-};
+  return { enrollments, loading, error, refetch: () => setLoading(true) };
+}
 
-export const useUserCertificates = (userId: string) => {
-  const [certificates, setCertificates] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!userId || !FEATURE_FLAGS.WEB3_ENABLED) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchCertificates = async () => {
-      try {
-        setLoading(true);
-        const response = await web3Service.getUserCertificates(userId);
-        setCertificates(response.documents || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch certificates');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCertificates();
-  }, [userId]);
-
-  return { certificates, loading, error };
-};
-
-// AI recommendations hook (only if AI features are enabled)
-export const useAIRecommendations = (userId: string) => {
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!userId || !FEATURE_FLAGS.AI_FEATURES_ENABLED) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchRecommendations = async () => {
-      try {
-        setLoading(true);
-        const response = await aiService.getRecommendations(userId);
-        setRecommendations(response.documents || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch recommendations');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecommendations();
-  }, [userId]);
-
-  return { recommendations, loading, error };
-};
-
-// Analytics hook for tracking events
-export const useAnalytics = () => {
-  const trackEvent = async (type: string, data: any = {}) => {
-    if (!FEATURE_FLAGS.ANALYTICS_ENABLED) return;
-
+export function useAnalytics() {
+  const trackEvent = async (eventType: string, data: any) => {
     try {
-      await analyticsService.createEvent({
-        user_id: 'anonymous', // This should be replaced with actual user ID when available
-        type,
-        data: JSON.stringify(data)
-      });
-    } catch (error) {
-      console.log('Analytics tracking failed:', error);
+      await appwriteDatabases.createDocument(
+        DATABASE_IDS.ANALYTICS,
+        COLLECTION_IDS.EVENTS,
+        'unique()',
+        {
+          event_id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          user_id: data.userId || 'anonymous',
+          type: eventType,
+          timestamp: new Date().toISOString(),
+          data: JSON.stringify(data)
+        }
+      );
+    } catch (err) {
+      console.error('Error tracking event:', err);
     }
   };
 
   return { trackEvent };
-};
+}

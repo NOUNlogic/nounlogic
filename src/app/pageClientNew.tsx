@@ -1,14 +1,12 @@
-// filepath: /home/nathfavour/Documents/code/nounlogic/nounlogic/src/app/pageClient.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Layers, Globe } from "lucide-react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { useAppwriteAuth } from "@/lib/appwrite/auth-context";
+import { useAppwriteAuth } from "@/lib/appwrite/auth-context-new";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useCourses, useInstitutions, useAnalytics } from "@/hooks/useDatabase";
 import { useCourses, useInstitutions, useAnalytics } from "@/hooks/useDatabase";
 
 // Advanced animation variants
@@ -66,61 +64,14 @@ export default function HomeClient() {
   const y = useSpring(mousePosition.y, springConfig);
 
   // Featured courses - use real data or fallback to mock data
-  const featuredCourses = courses.length > 0 ? courses.slice(0, 3).map(course => ({
+  const featuredCourses = courses.length > 0 ? courses.slice(0, 3).map((course, index) => ({
     id: course.$id,
     title: course.title,
     description: course.description,
     rating: 4.8, // This could be calculated from submissions/reviews
     students: 1248, // This could be calculated from enrollments
     institution: institutions.find(inst => inst.institution_id === course.institution_id)?.name || "Unknown Institution",
-    gradient: ["from-blue-500 to-purple-600", "from-emerald-500 to-teal-600", "from-orange-500 to-pink-600"][Math.floor(Math.random() * 3)]
-  })) : [
-    {
-      id: "1",
-      title: "Introduction to Blockchain",
-      description: "Learn the fundamentals of blockchain technology",
-      rating: 4.8,
-      students: 1248,
-      institution: "Blockchain Academy",
-      gradient: "from-blue-500 to-purple-600"
-    },
-    {
-      id: "2", 
-      title: "Smart Contract Development",
-      description: "Build secure and efficient smart contracts",
-      rating: 4.7,
-      students: 876,
-      institution: "Crypto Institute",
-      gradient: "from-emerald-500 to-teal-600"
-    },
-    {
-      id: "3",
-      title: "Web3 Integration",
-      description: "Connect your applications to blockchain networks",
-      rating: 4.9,
-      students: 654,
-      institution: "Tech University",
-      gradient: "from-orange-500 to-pink-600"
-    }
-  ];
-
-  // Dynamic achievements based on real data
-  const achievements = [
-    { icon: BookOpen, count: `${courses.length || 100}+`, label: "Courses", color: "text-blue-500" },
-    { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500" },
-    { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500" },
-    { icon: Building, count: `${institutions.length || 15}+`, label: "Institutions", color: "text-purple-500" }
-  ];
-
-  // Featured courses - use real data or fallback to mock data
-  const featuredCourses = courses.length > 0 ? courses.slice(0, 3).map(course => ({
-    id: course.$id,
-    title: course.title,
-    description: course.description,
-    rating: 4.8, // This could be calculated from submissions/reviews
-    students: 1248, // This could be calculated from enrollments
-    institution: institutions.find(inst => inst.institution_id === course.institution_id)?.name || "Unknown Institution",
-    gradient: ["from-blue-500 to-purple-600", "from-emerald-500 to-teal-600", "from-orange-500 to-pink-600"][Math.floor(Math.random() * 3)]
+    gradient: ["from-blue-500 to-purple-600", "from-emerald-500 to-teal-600", "from-orange-500 to-pink-600"][index % 3]
   })) : [
     {
       id: "1",
@@ -281,6 +232,7 @@ export default function HomeClient() {
                 <Link 
                   href="/register" 
                   className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl overflow-hidden shadow-2xl"
+                  onClick={() => trackEvent('hero_cta_click', { action: 'start_learning' })}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span className="relative flex items-center justify-center">
@@ -294,6 +246,7 @@ export default function HomeClient() {
                 <Link 
                   href="/courses" 
                   className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+                  onClick={() => trackEvent('hero_cta_click', { action: 'explore_courses' })}
                 >
                   Explore Courses
                 </Link>
@@ -331,7 +284,7 @@ export default function HomeClient() {
             <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
-                src="/images/hero/Image.webp"
+                src="/images/hero/hero.jpg"
                 alt="Web3 Learning Platform"
                 fill
                 className="object-cover"
@@ -397,7 +350,7 @@ export default function HomeClient() {
             <div className="relative w-full h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
-                src="/images/hero/Image.webp"
+                src="/images/hero/hero.jpg"
                 alt="Web3 Learning Platform"
                 fill
                 className="object-cover"
@@ -506,6 +459,7 @@ export default function HomeClient() {
                     <Link 
                       href={`/courses/${course.id}`}
                       className="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center group"
+                      onClick={() => trackEvent('course_click', { courseId: course.id, courseTitle: course.title })}
                     >
                       Explore
                       <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -525,6 +479,7 @@ export default function HomeClient() {
             <Link 
               href="/courses"
               className="inline-flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              onClick={() => trackEvent('view_all_courses_click', {})}
             >
               View All Courses
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -664,6 +619,7 @@ export default function HomeClient() {
               <Link 
                 href="/register" 
                 className="group relative px-10 py-5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-xl overflow-hidden shadow-2xl"
+                onClick={() => trackEvent('cta_register_click', { location: 'bottom_cta' })}
               >
                 <motion.div 
                   className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
@@ -682,6 +638,7 @@ export default function HomeClient() {
               <Link 
                 href="/login" 
                 className="px-10 py-5 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all shadow-lg text-lg"
+                onClick={() => trackEvent('cta_login_click', { location: 'bottom_cta' })}
               >
                 Sign In
               </Link>

@@ -1,4 +1,6 @@
 'use client';
+'use client';
+
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { appwriteAccount, ID } from './client';
 import { usersService, analyticsService, FEATURE_FLAGS } from './services';
