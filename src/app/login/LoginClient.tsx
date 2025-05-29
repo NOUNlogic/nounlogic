@@ -115,8 +115,7 @@ const LoginClient = () => {
             </p>
           }
         >
-          
-          <CardContent>
+          <div className="p-6">
             <div className="flex gap-2 mb-6 rounded-lg p-1 bg-white/5 backdrop-blur-sm border border-white/10">
               <button
                 type="button"
@@ -143,19 +142,17 @@ const LoginClient = () => {
                 Web3 Wallet
               </button>
             </div>
-            
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-md p-3 mb-4 text-sm flex items-start gap-2 animate-fadeIn">
                 <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             )}
-            
             <form onSubmit={handleSubmit} className="space-y-4">
               {loginMethod === 'email' ? (
                 <>
                   <div className="space-y-4">
-                    <Input
+                    <ThemedInput
                       label="Email"
                       type="email"
                       placeholder="Enter your email"
@@ -164,7 +161,7 @@ const LoginClient = () => {
                       disabled={isLoading}
                       leftIcon={<Mail className="text-muted-foreground" size={18} />}
                     />
-                    <Input
+                    <ThemedInput
                       label="Password"
                       type="password"
                       placeholder="Enter your password"
@@ -182,15 +179,14 @@ const LoginClient = () => {
                       </Link>
                     </div>
                   </div>
-                  
-                  <Button
+                  <ThemedButton
                     type="submit"
                     className="w-full mt-6 group"
                     disabled={isLoading}
                     rightIcon={<ArrowRight size={18} className="ml-1 transition-transform group-hover:translate-x-1" />}
                   >
                     {isLoading ? 'Signing in...' : 'Sign in with Email'}
-                  </Button>
+                  </ThemedButton>
                 </>
               ) : (
                 <div className="space-y-4">
@@ -200,21 +196,19 @@ const LoginClient = () => {
                       Connect your wallet to sign in securely using your blockchain identity
                     </p>
                   </div>
-                  
-                  <Button
+                  <ThemedButton
                     type="submit"
                     className="w-full group"
                     disabled={isLoading}
                     rightIcon={<ArrowRight size={18} className="ml-1 transition-transform group-hover:translate-x-1" />}
                   >
                     {isLoading ? 'Connecting...' : 'Connect Wallet'}
-                  </Button>
+                  </ThemedButton>
                 </div>
               )}
             </form>
-          </CardContent>
-          
-          <CardFooter className="flex flex-col">
+          </div>
+          <div className="flex flex-col p-6 pt-0">
             <div className="relative w-full my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border"></div>
@@ -225,17 +219,16 @@ const LoginClient = () => {
                 </span>
               </div>
             </div>
-            
-            <Button
+            <ThemedButton
               type="button"
               variant="outline"
               className="w-full hover:bg-secondary/20 transition-colors"
               onClick={() => router.push('/register')}
             >
               Create Account
-            </Button>
-          </CardFooter>
-        </Card>
+            </ThemedButton>
+          </div>
+        </ThemedCard>
         
         <div className="mt-6 text-center text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} NounLogic. All rights reserved.</p>
