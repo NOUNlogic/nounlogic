@@ -2,9 +2,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight } from "lucide-react";
+import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Layers, Globe } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { useAppwriteAuth } from "@/lib/appwrite/auth-context";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Mock data for featured courses
 const featuredCourses = [
@@ -14,15 +17,17 @@ const featuredCourses = [
     description: "Learn the fundamentals of blockchain technology",
     rating: 4.8,
     students: 1248,
-    institution: "Blockchain Academy"
+    institution: "Blockchain Academy",
+    gradient: "from-blue-500 to-purple-600"
   },
   {
-    id: "2",
+    id: "2", 
     title: "Smart Contract Development",
     description: "Build secure and efficient smart contracts",
     rating: 4.7,
     students: 876,
-    institution: "Crypto Institute"
+    institution: "Crypto Institute",
+    gradient: "from-emerald-500 to-teal-600"
   },
   {
     id: "3",
@@ -30,256 +35,621 @@ const featuredCourses = [
     description: "Connect your applications to blockchain networks",
     rating: 4.9,
     students: 654,
-    institution: "Tech University"
+    institution: "Tech University",
+    gradient: "from-orange-500 to-pink-600"
   }
 ];
 
-// Simplified motion variants if framer-motion is not available
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
+const achievements = [
+  { icon: BookOpen, count: "100+", label: "Courses", color: "text-blue-500" },
+  { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500" },
+  { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500" },
+  { icon: Building, count: "15+", label: "Institutions", color: "text-purple-500" }
+];
+
+// Advanced animation variants
+const heroVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6
+      duration: 1,
+      ease: [0.645, 0.045, 0.355, 1],
+      staggerChildren: 0.15
     }
   }
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
+const floatingAnimation = {
+  y: [0, -20, 0],
+  transition: {
+    duration: 6,
+    repeat: Infinity,
+    ease: "easeInOut"
   }
 };
 
-// Fallback component if framer-motion is not installed
-const MotionDiv = motion.div || 'div';
-const MotionSection = motion.section || 'section';
+const pulseAnimation = {
+  scale: [1, 1.05, 1],
+  transition: {
+    duration: 2,
+    repeat: Infinity,
+    ease: "easeInOut"
+  }
+};
 
 export default function HomeClient() {
+  const { user, loading } = useAppwriteAuth();
+  const router = useRouter();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const { scrollY } = useScroll();
+  
+  // Parallax effects
+  const y1 = useTransform(scrollY, [0, 300], [0, -50]);
+  const y2 = useTransform(scrollY, [0, 300], [0, -100]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0.3]);
+  
+  // Smooth spring animations
+  const springConfig = { damping: 25, stiffness: 120 };
+  const x = useSpring(mousePosition.x, springConfig);
+  const y = useSpring(mousePosition.y, springConfig);
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     setIsLoaded(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      setMousePosition({
+        x: (clientX - innerWidth / 2) / 50,
+        y: (clientY - innerHeight / 2) / 50
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/90">
-      {/* Hero Section */}
-      <MotionSection 
-        className="relative py-20 md:py-32 px-4 overflow-hidden"
-        initial="hidden"
-        animate={isLoaded ? "show" : "hidden"}
-        variants={staggerContainer}
-      >
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 w-full h-full bg-grid-pattern opacity-5"></div>
-        <div className="absolute top-20 right-20 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl opacity-30 animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent/10 rounded-full filter blur-3xl opacity-30 animate-pulse-slow animation-delay-2000"></div>
-        
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <MotionDiv variants={fadeIn}>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent leading-tight">
-              Welcome to NounLogic LMS
-            </h1>
-          </MotionDiv>
-          
-          <MotionDiv variants={fadeIn} className="max-w-3xl mx-auto">
-            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
-              A global learning management system designed for modern education and training in blockchain and web3 technologies.
-            </p>
-          </MotionDiv>
-          
-          <MotionDiv variants={fadeIn} className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link 
-              href="/dashboard" 
-              className="bg-primary hover:bg-primary/90 text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:translate-y-[-2px] group"
-            >
-              Go to Dashboard
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link 
-              href="/courses" 
-              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center transition-all shadow-md hover:shadow-lg hover:translate-y-[-2px]"
-            >
-              Browse Courses
-              <ChevronRight className="ml-1 h-5 w-5" />
-            </Link>
-          </MotionDiv>
-          
-          {/* Stats Section */}
-          <MotionDiv variants={fadeIn} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-slate-800/70 backdrop-blur-sm p-6 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50 hover:shadow-lg transition-all">
-              <p className="text-3xl md:text-4xl font-bold text-primary mb-1">100+</p>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">Courses</p>
-            </div>
-            <div className="bg-white dark:bg-slate-800/70 backdrop-blur-sm p-6 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50 hover:shadow-lg transition-all">
-              <p className="text-3xl md:text-4xl font-bold text-accent mb-1">50+</p>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">Instructors</p>
-            </div>
-            <div className="bg-white dark:bg-slate-800/70 backdrop-blur-sm p-6 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50 hover:shadow-lg transition-all">
-              <p className="text-3xl md:text-4xl font-bold text-secondary mb-1">20k+</p>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">Students</p>
-            </div>
-            <div className="bg-white dark:bg-slate-800/70 backdrop-blur-sm p-6 rounded-xl shadow-md border border-slate-200/50 dark:border-slate-700/50 hover:shadow-lg transition-all">
-              <p className="text-3xl md:text-4xl font-bold text-purple-500 mb-1">15+</p>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">Institutions</p>
-            </div>
-          </MotionDiv>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="relative">
+          <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-purple-500 rounded-full animate-spin animation-delay-150"></div>
         </div>
-      </MotionSection>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-x-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full opacity-30"
+            animate={{
+              y: [0, -100, 0],
+              x: [0, Math.random() * 100 - 50, 0],
+              opacity: [0.3, 0.8, 0.3]
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 10
+            }}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Hero Section */}
+      <motion.section 
+        className="relative min-h-screen flex items-center justify-center px-4"
+        initial="hidden"
+        animate={isLoaded ? "visible" : "hidden"}
+        variants={heroVariants}
+        style={{ y: y1, opacity }}
+      >
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left side - Content */}
+          <motion.div 
+            className="text-center lg:text-left z-10"
+            style={{ x: x, y: y }}
+          >
+            <motion.div
+              className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-6"
+              animate={pulseAnimation}
+            >
+              <Sparkles className="w-4 h-4 text-blue-400 mr-2" />
+              <span className="text-sm text-blue-300 font-medium">The Future of Learning</span>
+            </motion.div>
+
+            <motion.h1 
+              className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+              variants={heroVariants}
+            >
+              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Learn
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                Web3
+              </span>
+              <br />
+              <span className="text-white">
+                Today
+              </span>
+            </motion.h1>
+            
+            <motion.p 
+              className="text-xl md:text-2xl text-slate-300 mb-8 max-w-2xl"
+              variants={heroVariants}
+            >
+              Master blockchain technology, smart contracts, and decentralized applications with 
+              <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text font-semibold"> industry experts</span>
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 mb-12"
+              variants={heroVariants}
+            >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link 
+                  href="/register" 
+                  className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl overflow-hidden shadow-2xl"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span className="relative flex items-center justify-center">
+                    Start Learning Free
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link 
+                  href="/courses" 
+                  className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+                >
+                  Explore Courses
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Achievement Stats */}
+            <motion.div 
+              className="grid grid-cols-2 md:grid-cols-4 gap-6"
+              variants={heroVariants}
+            >
+              {achievements.map((achievement, index) => (
+                <motion.div
+                  key={achievement.label}
+                  className="text-center"
+                  animate={floatingAnimation}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  <div className={`w-12 h-12 mx-auto mb-2 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center ${achievement.color}`}>
+                    <achievement.icon className="w-6 h-6" />
+                  </div>
+                  <div className="text-2xl font-bold text-white">{achievement.count}</div>
+                  <div className="text-sm text-slate-400">{achievement.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* Right side - Hero Image */}
+          <motion.div 
+            className="relative lg:block hidden"
+            style={{ y: y2 }}
+            animate={floatingAnimation}
+          >
+            <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
+              <Image
+                src="/images/hero/hero.jpg"
+                alt="Web3 Learning Platform"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              
+              {/* Floating cards over image */}
+              <motion.div
+                className="absolute top-20 -right-6 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg z-20"
+                animate={{
+                  y: [0, -10, 0],
+                  rotate: [0, 2, 0]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">Live Learning</div>
+                    <div className="text-xs text-slate-600">2.4k students online</div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-20 -left-6 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg z-20"
+                animate={{
+                  y: [0, 10, 0],
+                  rotate: [0, -2, 0]
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Trophy className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">Certified</div>
+                    <div className="text-xs text-slate-600">Blockchain verified</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Mobile Hero Image */}
+          <motion.div 
+            className="relative lg:hidden mt-12"
+            animate={floatingAnimation}
+          >
+            <div className="relative w-full h-[400px] rounded-2xl overflow-hidden shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
+              <Image
+                src="/images/hero/hero.jpg"
+                alt="Web3 Learning Platform"
+                fill
+                className="object-cover"
+                priority
+                sizes="100vw"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
       
       {/* Featured Courses Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-slate-50/50 to-white/90 dark:from-slate-900/50 dark:to-slate-800/90">
+      <motion.section 
+        className="py-20 px-4 bg-gradient-to-b from-slate-900/50 to-slate-800/30 backdrop-blur-sm border-y border-white/10"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Courses</h2>
-            <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Explore our most popular courses in blockchain and web3 technologies
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Featured Courses
+            </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              Dive into cutting-edge blockchain and web3 technologies with our expertly crafted courses
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredCourses.map((course, index) => (
-              <div 
+              <motion.div 
                 key={course.id}
-                className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200/50 dark:border-slate-700/50 group"
+                className="group relative bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-500"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ scale: 1.05, y: -10 }}
               >
-                <div className="h-40 bg-gradient-to-r from-primary/10 to-accent/10 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <BookOpen className="h-10 w-10 text-primary" />
+                <div className={`h-48 bg-gradient-to-r ${course.gradient} relative overflow-hidden`}>
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <motion.div
+                      className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.8 }}
+                    >
+                      <BookOpen className="h-8 w-8 text-white" />
+                    </motion.div>
                   </div>
+                  
+                  {/* Floating particles in course card */}
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-white/60 rounded-full"
+                      animate={{
+                        y: [0, -30, 0],
+                        opacity: [0, 1, 0]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        delay: i * 0.5
+                      }}
+                      style={{
+                        left: `${20 + i * 15}%`,
+                        top: `${70 + i * 5}%`
+                      }}
+                    />
+                  ))}
                 </div>
                 
                 <div className="p-6">
-                  <div className="flex items-center text-yellow-500 mb-2">
+                  <div className="flex items-center text-yellow-400 mb-3">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`h-4 w-4 ${i < Math.floor(course.rating) ? 'fill-yellow-500' : 'fill-transparent'}`} />
+                      <Star 
+                        key={i} 
+                        className={`h-4 w-4 ${i < Math.floor(course.rating) ? 'fill-yellow-400' : 'fill-transparent'}`} 
+                      />
                     ))}
-                    <span className="ml-2 text-sm text-slate-600 dark:text-slate-300">
+                    <span className="ml-2 text-sm text-slate-400">
                       {course.rating} ({course.students} students)
                     </span>
                   </div>
                   
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors">
                     {course.title}
                   </h3>
                   
-                  <p className="text-slate-600 dark:text-slate-300 mb-4 text-sm">
+                  <p className="text-slate-400 mb-4 text-sm leading-relaxed">
                     {course.description}
                   </p>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center">
+                    <span className="text-xs text-slate-500 flex items-center">
                       <Building className="h-3 w-3 mr-1" />
                       {course.institution}
                     </span>
                     
                     <Link 
                       href={`/courses/${course.id}`}
-                      className="text-primary hover:text-primary/80 font-medium text-sm flex items-center"
+                      className="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center group"
                     >
-                      View Course
-                      <ChevronRight className="h-4 w-4 ml-1" />
+                      Explore
+                      <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
           
-          <div className="text-center mt-12">
+          <motion.div 
+            className="text-center mt-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <Link 
               href="/courses"
-              className="inline-flex items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary px-6 py-3 rounded-lg font-medium transition-colors"
+              className="inline-flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               View All Courses
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
       
       {/* Features Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose NounLogic LMS</h2>
-            <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Our platform provides everything you need for modern blockchain education
+      <motion.section 
+        className="py-20 px-4 relative"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        {/* Animated background grid */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_100%)]"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Why Choose 
+              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"> NounLogic</span>
+            </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              Experience the future of education with cutting-edge technology and innovative learning methods
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-all border border-slate-200/50 dark:border-slate-700/50">
-              <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-5">
-                <Zap className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Interactive Learning</h3>
-              <p className="text-slate-600 dark:text-slate-300">
-                Engage with interactive content, quizzes, and hands-on exercises for a better learning experience.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-all border border-slate-200/50 dark:border-slate-700/50">
-              <div className="w-14 h-14 bg-accent/10 rounded-lg flex items-center justify-center mb-5">
-                <UserCog className="h-7 w-7 text-accent" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Expert Instructors</h3>
-              <p className="text-slate-600 dark:text-slate-300">
-                Learn from industry experts with real-world experience in blockchain and web3 technologies.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-all border border-slate-200/50 dark:border-slate-700/50">
-              <div className="w-14 h-14 bg-purple-500/10 rounded-lg flex items-center justify-center mb-5">
-                <Award className="h-7 w-7 text-purple-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Blockchain Certificates</h3>
-              <p className="text-slate-600 dark:text-slate-300">
-                Earn verifiable certificates stored on blockchain for your completed courses and achievements.
-              </p>
-            </div>
+            {[
+              {
+                icon: Zap,
+                title: "Interactive Learning",
+                description: "Immersive experiences with real-time feedback, hands-on labs, and interactive simulations that make learning engaging and effective.",
+                color: "from-yellow-400 to-orange-500",
+                bgColor: "bg-yellow-500/10"
+              },
+              {
+                icon: UserCog,
+                title: "Expert Instructors",
+                description: "Learn from industry veterans and blockchain pioneers who bring real-world experience and cutting-edge knowledge to every lesson.",
+                color: "from-blue-400 to-purple-500",
+                bgColor: "bg-blue-500/10"
+              },
+              {
+                icon: Award,
+                title: "Blockchain Certificates",
+                description: "Earn immutable, verifiable credentials stored on blockchain that prove your expertise and can be shared globally.",
+                color: "from-emerald-400 to-teal-500",
+                bgColor: "bg-emerald-500/10"
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                className="group relative bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-8 hover:border-slate-600/50 transition-all duration-500"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ scale: 1.05, y: -10 }}
+              >
+                <motion.div 
+                  className={`w-16 h-16 ${feature.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  whileHover={{ rotate: 10 }}
+                >
+                  <feature.icon className={`h-8 w-8 bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`} />
+                </motion.div>
+                
+                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-slate-200 transition-colors">
+                  {feature.title}
+                </h3>
+                
+                <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                  {feature.description}
+                </p>
+
+                {/* Hover effect overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </motion.section>
       
       {/* Call to Action */}
-      <section className="py-16 px-4 bg-gradient-to-br from-primary/10 to-accent/10 border-t border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Learning?</h2>
-          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of students already learning on our platform. Create an account today and start your journey.
-          </p>
+      <motion.section 
+        className="py-20 px-4 relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30"></div>
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity }}
+        ></motion.div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold mb-6 text-white"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Ready to 
+            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"> Transform </span>
+            Your Future?
+          </motion.h2>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/register" 
-              className="bg-primary hover:bg-primary/90 text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:translate-y-[-2px] group"
-            >
-              Create Free Account
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link 
-              href="/login" 
-              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-semibold py-4 px-8 rounded-xl flex items-center justify-center transition-all shadow-md hover:shadow-lg hover:translate-y-[-2px]"
-            >
-              Sign In
-            </Link>
-          </div>
+          <motion.p 
+            className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Join thousands of innovators already building the future. Start your Web3 journey today with our comprehensive learning platform.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link 
+                href="/register" 
+                className="group relative px-10 py-5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-xl overflow-hidden shadow-2xl"
+              >
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                ></motion.div>
+                <span className="relative flex items-center justify-center text-lg">
+                  Start Learning Free
+                  <ArrowRight className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-2" />
+                </span>
+              </Link>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link 
+                href="/login" 
+                className="px-10 py-5 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all shadow-lg text-lg"
+              >
+                Sign In
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
       
       {/* Footer */}
-      <footer className="py-8 px-4 bg-white dark:bg-slate-800/50 border-t border-slate-200/50 dark:border-slate-700/50">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-slate-600 dark:text-slate-300 text-sm">
-            © {new Date().getFullYear()} NounLogic LMS. All rights reserved.
-          </p>
+      <footer className="py-8 px-4 bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                NounLogic
+              </h3>
+              <p className="text-slate-400 text-sm mt-1">The Future of Web3 Education</p>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <Link href="/about" className="text-slate-400 hover:text-white transition-colors">About</Link>
+              <Link href="/contact" className="text-slate-400 hover:text-white transition-colors">Contact</Link>
+              <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors">Privacy</Link>
+            </div>
+          </div>
+          
+          <div className="border-t border-slate-700/50 mt-8 pt-8 text-center">
+            <p className="text-slate-500 text-sm">
+              © {new Date().getFullYear()} NounLogic LMS. Powered by blockchain technology.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

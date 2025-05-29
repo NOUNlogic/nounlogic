@@ -1,5 +1,10 @@
-import { redirect } from 'next/navigation';
+import HomeClient from './pageClient';
+import { AppwriteAuthProvider } from '@/lib/appwrite/auth-context';
 
 export default function Home() {
-  redirect('/dashboard');
+  return (
+    <AppwriteAuthProvider>
+      <HomeClient />
+    </AppwriteAuthProvider>
+  );
 }
