@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import MobileBottomBar from './MobileBottomBar';
+import BottomNav from './BottomNav';
 import Layout from './Layout';
 
 interface MainLayoutProps {
@@ -18,11 +19,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   useEffect(() => {
     setMounted(true);
     const checkMobileView = () => {
-      if (window.innerWidth < 768) {
-        setSidebarExpanded(false);
-      } else {
-        setSidebarExpanded(true);
-      }
+      // Do nothing
     };
     
     // Set initial state
@@ -35,8 +32,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return () => window.removeEventListener('resize', checkMobileView);
   }, []);
   
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
   const toggleSidebar = () => {
-    setSidebarExpanded(!sidebarExpanded);
+    setSidebarOpen(!sidebarOpen);
   };
 
   if (!mounted) {
@@ -72,6 +71,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <MobileBottomBar />
         </div>
       </div>
+      <BottomNav />
     </Layout>
   );
 };

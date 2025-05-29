@@ -170,7 +170,7 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
                   <a href="/login" className="block px-4 py-2 text-foreground hover:bg-primary/10 hover:text-primary transition-colors">Sign in</a>
                   <a href="/register" className="block px-4 py-2 text-foreground hover:bg-primary/10 hover:text-primary transition-colors">Register</a>
                   <a 
-                    href="https://whatsapp.com/channel/XXXXXXXXXXXX" 
+                    href="https://chat.whatsapp.com/IVyll17nbSv6Y8D8NCscIC" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="flex items-center px-4 py-2 text-sm border-t border-border whatsapp-btn hover:text-green-600 dark:hover:text-green-400 transition-colors"
