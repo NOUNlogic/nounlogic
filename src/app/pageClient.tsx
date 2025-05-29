@@ -268,7 +268,7 @@ export default function HomeClient() {
             <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
-                src="/images/hero/hero.jpg"
+                src="/images/hero/Image.webp"
                 alt="Web3 Learning Platform"
                 fill
                 className="object-cover"
@@ -334,7 +334,7 @@ export default function HomeClient() {
             <div className="relative w-full h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
-                src="/images/hero/hero.jpg"
+                src="/images/hero/Image.webp"
                 alt="Web3 Learning Platform"
                 fill
                 className="object-cover"
