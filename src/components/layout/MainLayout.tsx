@@ -10,13 +10,22 @@ interface MainLayoutProps {
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  // Only show sidebar expanded by default on desktop
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   // Check if we're on mobile on initial load and when window resizes
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      // Auto-collapse sidebar on mobile, auto-expand on desktop
+      if (!mobile && !sidebarOpen) {
+        setSidebarOpen(true);
+      } else if (mobile && sidebarOpen) {
+        setSidebarOpen(false);
+      }
     };
     
     // Set initial value
@@ -29,48 +38,29 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return () => {
       window.removeEventListener('resize', checkIfMobile);
     };
-  }, []);
+  }, [sidebarOpen]);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Close sidebar when clicking anywhere else on mobile
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isMobile && sidebarOpen) {
-        setSidebarOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [isMobile, sidebarOpen]);
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
       <Topbar toggleSidebar={toggleSidebar} />
       
-      {/* Sidebar - Only visible on desktop or when opened on mobile */}
+      {/* Single Sidebar Component - Only visible on desktop */}
       <div
-        className={`fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white dark:bg-slate-900 border-r border-border z-40 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
+        className={`fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 z-40 transform transition-all duration-300 ease-in-out 
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+          ${isMobile ? 'hidden' : 'block'}`}
       >
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       </div>
       
-      {/* Overlay to close sidebar on mobile */}
-      {isMobile && sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      
-      <main className="pt-16 pb-20 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-64 transition-all duration-300">
+      <main 
+        className={`pt-16 pb-20 md:pb-8 px-4 sm:px-6 lg:px-8 transition-all duration-300 text-slate-900 dark:text-slate-200
+          ${sidebarOpen && !isMobile ? 'md:ml-64' : 'ml-0'}`}
+      >
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

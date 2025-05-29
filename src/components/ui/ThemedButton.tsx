@@ -37,15 +37,19 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
     lg: 'py-3 px-6 text-base',
   };
 
-  const variantClasses = {
+  const      variantClasses = {
     default: isDark 
       ? 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/20 shadow-lg'
       : 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/20 shadow-md',
     secondary: isDark
       ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary/20'
       : 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary/20',
-    outline: 'border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground focus:ring-primary/20',
-    ghost: 'text-primary bg-transparent hover:bg-primary/10 focus:ring-primary/20',
+    outline: isDark
+      ? 'border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground focus:ring-primary/20'
+      : 'border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground focus:ring-primary/20',
+    ghost: isDark
+      ? 'text-primary bg-transparent hover:bg-primary/10 focus:ring-primary/20'
+      : 'text-primary bg-transparent hover:bg-primary/10 focus:ring-primary/20',
     gradient: `bg-gradient-to-r ${theme.gradients.primary} text-white hover:opacity-90 focus:ring-primary/20 shadow-lg hover:shadow-xl hover:scale-[1.02]`,
     destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive/20',
   };

@@ -23,7 +23,7 @@ const MobileBottomBar: React.FC = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/90 backdrop-blur-lg border-t border-border/50 z-50 shadow-lg shadow-black/5">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-border z-50 shadow-lg">
       <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
@@ -35,8 +35,8 @@ const MobileBottomBar: React.FC = () => {
               href={item.href}
               className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 min-w-0 flex-1 group ${
                 isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground hover:text-primary"
+                  ? "text-purple-600 dark:text-purple-400" 
+                  : "text-slate-700 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400"
               }`}
             >
               <div className={`relative transition-all duration-200 ${
@@ -45,18 +45,18 @@ const MobileBottomBar: React.FC = () => {
                 <Icon 
                   size={20} 
                   className={`transition-all duration-200 ${
-                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                    isActive ? "text-purple-600 dark:text-purple-400" : "text-slate-700 dark:text-slate-300 group-hover:text-purple-600 dark:group-hover:text-purple-400"
                   }`} 
                 />
                 {isActive && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full animate-pulse"></div>
                 )}
               </div>
               
               <span className={`text-xs mt-1 font-medium transition-all duration-200 truncate max-w-full ${
                 isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground group-hover:text-primary"
+                  ? "text-purple-600 dark:text-purple-400" 
+                  : "text-slate-700 dark:text-slate-300 group-hover:text-purple-600 dark:group-hover:text-purple-400"
               }`}>
                 {item.name}
               </span>

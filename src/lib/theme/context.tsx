@@ -66,11 +66,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       root.style.setProperty(`--blur-${key}`, value);
     });
 
-    // Set dark class on document
+    // Set dark class on document and ensure proper text color accessibility
     if (isDark) {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      root.style.setProperty('--text-primary', '210 40% 98%');
+      root.style.setProperty('--text-secondary', '215 20.2% 70.1%');
+      root.style.setProperty('--text-muted', '215 20.2% 70.1%');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      root.style.setProperty('--text-primary', '222.2 84% 4.9%');
+      root.style.setProperty('--text-secondary', '215.4 16.3% 46.9%');
+      root.style.setProperty('--text-muted', '215.4 16.3% 46.9%');
     }
   };
 

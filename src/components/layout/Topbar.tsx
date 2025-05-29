@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Menu, Search, Bell, User, LogOut, ChevronDown, Sun, Moon, MessageSquare } from 'lucide-react';
 import { account } from '@/lib/appwrite';
 import { useTheme } from '@/lib/theme';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface TopbarProps {
   toggleSidebar: () => void;
@@ -37,6 +38,14 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
 
   const toggleTheme = () => {
     setMode(isDark ? 'light' : 'dark');
+    
+    // Ensure the theme change is properly applied
+    const htmlElement = document.documentElement;
+    if (isDark) {
+      htmlElement.classList.remove('dark');
+    } else {
+      htmlElement.classList.add('dark');
+    }
   };
 
   return (
@@ -48,9 +57,10 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
         fixed top-0 left-0 right-0 z-40 transition-all duration-300`}
     >
       <div className="flex items-center">
+        {/* Sidebar toggle button - only shown on desktop */}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-lg hover:bg-secondary/80 transition-colors mr-3 md:hidden"
+          className="p-2 rounded-lg hover:bg-secondary/80 transition-colors mr-3 hidden md:block"
           aria-label="Toggle sidebar"
         >
           <Menu size={20} />
@@ -93,14 +103,8 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
           <Search size={20} />
         </button>
         
-        {/* Theme Toggle - Simplified */}
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-lg transition-all duration-200 hover:bg-secondary flex items-center justify-center theme-toggle-btn ${isDark ? 'text-yellow-200 hover:text-yellow-300' : 'text-purple-700 hover:text-purple-800'}`}
-          aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-        >
-          {isDark ? <Sun size={20} className="transition-transform duration-300" /> : <Moon size={20} className="transition-transform duration-300" />}
-        </button>
+        {/* Theme Toggle */}
+        <ThemeToggle />
         
         {/* Notifications */}
         <button 

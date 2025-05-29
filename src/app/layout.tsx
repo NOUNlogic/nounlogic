@@ -1,13 +1,13 @@
-import React from 'react';
-import { Inter } from 'next/font/google';
 import './globals.css';
-import AppProviders from './providers';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { ThemeProvider } from '@/lib/theme';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' });
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'NounLogic LMS',
-  description: 'Global Learning Management System with Web3 Integration',
+  description: 'Web3 Learning Management System',
 };
 
 export default function RootLayout({
@@ -16,11 +16,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AppProviders>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300`}>
+        <ThemeProvider>
           {children}
-        </AppProviders>
+        </ThemeProvider>
       </body>
     </html>
   );

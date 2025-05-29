@@ -13,43 +13,28 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = '', 
   showLabel = false 
 }) => {
-  const { mode, setMode, isDark } = useTheme();
-
-  const toggleOptions = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'system', icon: Monitor, label: 'System' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-  ] as const;
+  const { toggleTheme, isDark } = useTheme();
 
   return (
-    <div className={`flex items-center space-x-1 ${className}`}>
-      {toggleOptions.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          onClick={() => setMode(value)}
-          className={`
-            p-2 rounded-lg transition-all duration-200
-            ${mode === value 
-              ? isDark 
-                ? 'bg-primary text-primary-foreground shadow-md' 
-                : 'bg-primary text-primary-foreground shadow-md'
-              : isDark
-                ? 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-            }
-          `}
-          title={label}
-          aria-label={`Switch to ${label.toLowerCase()} theme`}
-        >
-          <Icon size={18} />
-        </button>
-      ))}
+    <button
+      onClick={toggleTheme}
+      className={`
+        p-2 rounded-lg transition-all duration-300 hover:bg-secondary flex items-center justify-center theme-toggle-btn ${className}
+        ${isDark ? 'text-yellow-200 hover:text-yellow-300' : 'text-purple-700 hover:text-purple-800'}
+      `}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+    >
+      {isDark ? 
+        <Sun size={18} className="transition-transform duration-300" /> : 
+        <Moon size={18} className="transition-transform duration-300" />
+      }
       {showLabel && (
-        <span className="ml-2 text-sm text-muted-foreground capitalize">
-          {mode}
+        <span className="ml-2 text-sm font-medium capitalize">
+          {isDark ? 'Light Mode' : 'Dark Mode'}
         </span>
       )}
-    </div>
+    </button>
   );
 };
 
