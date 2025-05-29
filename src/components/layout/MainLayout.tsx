@@ -4,75 +4,80 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import MobileBottomBar from './MobileBottomBar';
-import BottomNav from './BottomNav';
-import Layout from './Layout';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  
-  // Check if window width is mobile on initial load
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're on mobile on initial load and when window resizes
   useEffect(() => {
-    setMounted(true);
-    const checkMobileView = () => {
-      // Do nothing
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
     
-    // Set initial state
-    checkMobileView();
+    // Set initial value
+    checkIfMobile();
     
-    // Add event listener for resize
-    window.addEventListener('resize', checkMobileView);
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile);
     
-    // Cleanup
-    return () => window.removeEventListener('resize', checkMobileView);
+    // Clean up the event listener when component unmounts
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
   }, []);
-  
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  if (!mounted) {
-    return <div className="flex h-screen items-center justify-center">
-      <div className="spinner"></div>
-    </div>;
-  }
+  // Close sidebar when clicking anywhere else on mobile
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMobile && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isMobile, sidebarOpen]);
 
   return (
-    <Layout>
-      <div className="flex min-h-screen bg-background">
-        {/* Desktop Sidebar */}
-        <Sidebar isOpen={sidebarExpanded} toggleSidebar={toggleSidebar} />
-        
-        <div className={`flex-1 transition-all duration-300 ${
-          sidebarExpanded ? 'md:ml-64' : 'md:ml-20'
-        }`}>
-          <Topbar toggleSidebar={toggleSidebar} />
-          
-          <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">
-            <div className="p-4 md:p-6">
-              {children}
-            </div>
-          </main>
-          
-          <footer className="hidden md:block border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} NounLogic Learning Management System. All rights reserved.</p>
-          </footer>
-        </div>
-        
-        {/* Mobile Bottom Navigation - fixed to bottom */}
-        <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-          <MobileBottomBar />
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
+      <Topbar toggleSidebar={toggleSidebar} />
+      
+      {/* Sidebar - Only visible on desktop or when opened on mobile */}
+      <div
+        className={`fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white dark:bg-slate-900 border-r border-border z-40 transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
+      >
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       </div>
-      <BottomNav />
-    </Layout>
+      
+      {/* Overlay to close sidebar on mobile */}
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      <main className="pt-16 pb-20 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-64 transition-all duration-300">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
+      </main>
+      
+      <MobileBottomBar />
+    </div>
   );
 };
 

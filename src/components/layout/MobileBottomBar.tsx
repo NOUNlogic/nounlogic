@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
   BookOpen, 
-  Users, 
+  Building, 
   Brain, 
-  Settings 
+  Wallet 
 } from 'lucide-react';
 
 const MobileBottomBar: React.FC = () => {
@@ -17,9 +17,9 @@ const MobileBottomBar: React.FC = () => {
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Courses", href: "/courses", icon: BookOpen },
-    { name: "Users", href: "/users", icon: Users },
+    { name: "Institutions", href: "/institutions", icon: Building },
     { name: "AI", href: "/ai", icon: Brain },
-    { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Web3", href: "/web3", icon: Wallet },
   ];
 
   return (
