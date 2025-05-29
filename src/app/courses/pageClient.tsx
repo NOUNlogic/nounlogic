@@ -108,6 +108,270 @@ export default function CoursesClient() {
   });
 
   return (
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-purple-50 dark:from-slate-950 dark:via-blue-950/20 dark:to-slate-950 px-4 sm:px-6 lg:px-8 py-6 space-y-8 transition-all duration-300">
+        {/* Animated floating orbs */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-32 left-32 w-36 h-36 bg-gradient-to-r from-blue-400/20 to-indigo-500/20 rounded-full blur-xl animate-float"></div>
+          <div className="absolute top-60 right-40 w-28 h-28 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full blur-xl animate-float-delayed"></div>
+          <div className="absolute bottom-40 left-1/4 w-44 h-44 bg-gradient-to-r from-indigo-400/20 to-blue-500/20 rounded-full blur-xl animate-float-slow"></div>
+        </div>
+
+        {/* Header with enhanced design */}
+        <div className="text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 animate-float mb-4">
+            <BookOpen className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent animate-gradient mb-4">
+              Explore Courses
+            </h1>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Discover and enroll in courses that match your learning goals
+            </p>
+          </div>
+        </div>
+
+        {/* Search and filters with enhanced styling */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-700/50 p-6">
+            <div className="flex flex-col lg:flex-row gap-4 items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+              
+              {/* View mode toggle */}
+              <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-3 rounded-lg transition-all duration-200 ${
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <Grid className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-3 rounded-lg transition-all duration-200 ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <List className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Category filters */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  selectedCategory === null
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
+                    : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                }`}
+              >
+                All Categories
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    selectedCategory === category
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
+                      : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Courses grid/list with enhanced styling */}
+        <div className="max-w-7xl mx-auto">
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredCourses.map((course, index) => (
+                <div
+                  key={course.id}
+                  className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-full backdrop-blur-sm">
+                        {course.level}
+                      </span>
+                    </div>
+                    <div className="absolute top-4 right-4">
+                      {course.hasNFTCertificate && (
+                        <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Award className="h-4 w-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
+                        {course.category}
+                      </span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{course.rating}</span>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {course.title}
+                    </h3>
+                    
+                    <p className="text-slate-600 dark:text-slate-300 text-sm mb-4 line-clamp-2">
+                      {course.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-slate-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-300">{course.instructor}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-slate-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-300">{course.duration}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-4 w-4 text-slate-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-300">
+                          {course.enrolledStudents.toLocaleString()} students
+                        </span>
+                      </div>
+                      <Link href={`/courses/${course.id}`}>
+                        <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 text-sm font-medium">
+                          Enroll Now
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredCourses.map((course, index) => (
+                <div
+                  key={course.id}
+                  className="group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex flex-col md:flex-row">
+                    <div className="relative md:w-80 h-48 md:h-auto overflow-hidden">
+                      <img
+                        src={course.image}
+                        alt={course.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 bg-white/90 dark:bg-slate-800/90 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-full backdrop-blur-sm">
+                          {course.level}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
+                              {course.category}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{course.rating}</span>
+                            </div>
+                            {course.hasNFTCertificate && (
+                              <div className="flex items-center space-x-1">
+                                <Award className="h-4 w-4 text-yellow-500" />
+                                <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">NFT Certificate</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {course.title}
+                          </h3>
+                          
+                          <p className="text-slate-600 dark:text-slate-300 mb-4 line-clamp-2">
+                            {course.description}
+                          </p>
+                          
+                          <div className="flex items-center space-x-6 text-sm text-slate-600 dark:text-slate-300">
+                            <div className="flex items-center space-x-1">
+                              <User className="h-4 w-4" />
+                              <span>{course.instructor}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-4 w-4" />
+                              <span>{course.duration}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-4 w-4" />
+                              <span>{course.enrolledStudents.toLocaleString()} students</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="ml-6">
+                          <Link href={`/courses/${course.id}`}>
+                            <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium">
+                              Enroll Now
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {filteredCourses.length === 0 && (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-4">
+                <Search className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No courses found</h3>
+              <p className="text-slate-600 dark:text-slate-300">Try adjusting your search or filter criteria</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
+  );
     <div className="px-4 py-6 space-y-6 ml-0 md:ml-64">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Courses</h1>
