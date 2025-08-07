@@ -24,7 +24,7 @@ export const useTheme = () => {
   return context;
 };
 
-interface ThemeProviderProps {
+export interface ThemeProviderProps {
   children: ReactNode;
   defaultMode?: ThemeMode;
   storageKey?: string;
@@ -62,9 +62,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     });
 
     // Apply blur variables
-    Object.entries(themeConfig.blur).forEach(([key, value]) => {
-      root.style.setProperty(`--blur-${key}`, value);
-    });
+    if (themeConfig.blur) {
+      Object.entries(themeConfig.blur).forEach(([key, value]) => {
+        root.style.setProperty(`--blur-${key}`, value);
+      });
+    }
 
     // Set dark class on document and ensure proper text color accessibility
     if (isDark) {

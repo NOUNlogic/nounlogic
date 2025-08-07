@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/lib/theme';
+import AppProviders from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,9 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-200 transition-colors duration-300`}>
-        <ThemeProvider>
+        <AppProviders>
           {children}
-        </ThemeProvider>
+        </AppProviders>
       </body>
     </html>
   );

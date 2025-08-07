@@ -112,7 +112,7 @@ interface AppProvidersProps {
 
 export default function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ThemeProvider defaultMode="system">
+    <ThemeProvider defaultMode={"system" as any}>
       <AuthProvider>
         {children}
       </AuthProvider>
