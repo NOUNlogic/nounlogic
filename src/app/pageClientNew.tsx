@@ -17,7 +17,7 @@ const heroVariants = {
     y: 0,
     transition: {
       duration: 1,
-      ease: [0.645, 0.045, 0.355, 1],
+      ease: "easeInOut",
       staggerChildren: 0.15
     }
   }

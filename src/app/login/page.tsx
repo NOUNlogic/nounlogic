@@ -6,6 +6,12 @@ export const metadata = {
   description: 'Sign in to your account',
 };
 
+import { AuthProvider } from '@/app/providers';
+
 export default function LoginPage() {
-  return <LoginClient />;
+  return (
+    <AuthProvider>
+      <LoginClient />
+    </AuthProvider>
+  );
 }

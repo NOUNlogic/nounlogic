@@ -9,7 +9,6 @@ import { useAppwriteAuth } from "@/lib/appwrite/auth-context";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCourses, useInstitutions, useAnalytics } from "@/hooks/useDatabase";
-import { useCourses, useInstitutions, useAnalytics } from "@/hooks/useDatabase";
 
 // Advanced animation variants
 const heroVariants = {
@@ -19,7 +18,7 @@ const heroVariants = {
     y: 0,
     transition: {
       duration: 1,
-      ease: [0.645, 0.045, 0.355, 1],
+      ease: "easeInOut",
       staggerChildren: 0.15
     }
   }
