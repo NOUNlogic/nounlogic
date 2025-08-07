@@ -285,7 +285,7 @@ export default function HomeClient() {
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
                 src="/images/hero/hero.jpg"
-                alt="Web3 Learning Platform"
+                alt="NounLogic Web3 Learning Platform 🚀📚"
                 fill
                 className="object-cover"
                 priority
@@ -351,7 +351,7 @@ export default function HomeClient() {
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 z-10"></div>
               <Image
                 src="/images/hero/hero.jpg"
-                alt="Web3 Learning Platform"
+                alt="NounLogic Web3 Learning Platform 🚀📚"
                 fill
                 className="object-cover"
                 priority
