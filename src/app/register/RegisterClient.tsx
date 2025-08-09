@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle, Eye, EyeOff, Sparkles, Crown, Shield, Home, ArrowRight, ArrowLeft } from 'lucide-react';
+import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle, Eye, EyeOff, Sparkles, Crown, Shield, Home, ArrowRight, ArrowLeft, Star, Zap, Rocket, Gem } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { Button, Input } from '@/components/ui';
 import {
