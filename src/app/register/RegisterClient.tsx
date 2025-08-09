@@ -3,18 +3,27 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/CardComponents';
-import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle, Eye, EyeOff, Sparkles, Crown, Shield, Home, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/app/providers';
+import { Button, Input } from '@/components/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from '@/components/ui/CardComponents';
 
 const RegisterClient = () => {
+  const [formAnimation, setFormAnimation] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [registerMethod, setRegisterMethod] = useState<'email' | 'wallet'>('email');
   const [formStep, setFormStep] = useState(1);
-  const [formAnimation, setFormAnimation] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { register } = useAuth();
   
   // Form state
@@ -29,16 +38,48 @@ const RegisterClient = () => {
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registrationProgress, setRegistrationProgress] = useState(0);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   
-  // For animating form transitions
-  useEffect(() => {
-    if (formAnimation) {
-      const timer = setTimeout(() => {
-        setFormAnimation(false);
-      }, 300);
-      return () => clearTimeout(timer);
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        staggerChildren: 0.1
+      }
     }
-  }, [formAnimation]);
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    }
+  };
+
+  useEffect(() => {
+    setIsLoaded(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      setMousePosition({
+        x: (clientX - innerWidth / 2) / 50,
+        y: (clientY - innerHeight / 2) / 50
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;

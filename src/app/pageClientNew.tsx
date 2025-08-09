@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Layers, Globe, Target, Gamepad2, Shield, Coins, Crown, Flame, LogIn } from "lucide-react";
+import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Target, Shield, Coins, Crown, Flame, LogIn } from "lucide-react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { useAppwriteAuth } from "@/lib/appwrite/auth-context-new";
@@ -54,8 +54,8 @@ export default function HomeClient() {
   const { scrollY } = useScroll();
   
   // Database hooks
-  const { courses, loading: coursesLoading } = useCourses();
-  const { institutions, loading: institutionsLoading } = useInstitutions();
+  const { courses } = useCourses();
+  const { institutions } = useInstitutions();
   const { trackEvent } = useAnalytics();
   
   // Parallax effects
@@ -161,7 +161,12 @@ export default function HomeClient() {
     setIsLoaded(true);
     
     // Award initial points for visiting
-    setTimeout(() => handleInteraction("visit", 50), 1000);
+    const awardInitialPoints = () => {
+      setGameScore(prev => prev + 50);
+      setLevel(1);
+    };
+    
+    setTimeout(awardInitialPoints, 1000);
     
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
