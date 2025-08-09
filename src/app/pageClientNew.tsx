@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Layers, Globe } from "lucide-react";
+import { ArrowRight, BookOpen, UserCog, Building, Star, Zap, Award, ChevronRight, Sparkles, Trophy, Users, Layers, Globe, Target, Gamepad2, Shield, Coins, Crown, Flame, LogIn } from "lucide-react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { useAppwriteAuth } from "@/lib/appwrite/auth-context-new";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -46,6 +46,11 @@ export default function HomeClient() {
   const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [gameScore, setGameScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [achievements, setAchievements] = useState<string[]>([]);
+  const [showAchievement, setShowAchievement] = useState(false);
+  const [latestAchievement, setLatestAchievement] = useState("");
   const { scrollY } = useScroll();
   
   // Database hooks
@@ -103,12 +108,48 @@ export default function HomeClient() {
   ];
 
   // Dynamic achievements based on real data
-  const achievements = [
-    { icon: BookOpen, count: `${courses.length || 100}+`, label: "Courses", color: "text-blue-500" },
-    { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500" },
-    { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500" },
-    { icon: Building, count: `${institutions.length || 15}+`, label: "Institutions", color: "text-purple-500" }
+  const statsAchievements = [
+    { icon: BookOpen, count: `${courses.length || 100}+`, label: "Courses", color: "text-blue-500", bgColor: "bg-blue-500/20" },
+    { icon: Users, count: "50+", label: "Instructors", color: "text-emerald-500", bgColor: "bg-emerald-500/20" },
+    { icon: Trophy, count: "20k+", label: "Students", color: "text-orange-500", bgColor: "bg-orange-500/20" },
+    { icon: Building, count: `${institutions.length || 15}+`, label: "Institutions", color: "text-purple-500", bgColor: "bg-purple-500/20" }
   ];
+
+  // Gamification elements
+  const userLevelData = {
+    currentXP: gameScore,
+    nextLevelXP: level * 1000,
+    progress: (gameScore % 1000) / 10
+  };
+
+  const availableAchievements = [
+    { id: "explorer", name: "Explorer", description: "Visited the landing page", icon: Target, unlocked: true },
+    { id: "learner", name: "Eager Learner", description: "Clicked on a course", icon: BookOpen, unlocked: achievements.includes("learner") },
+    { id: "social", name: "Social Butterfly", description: "Shared content", icon: Users, unlocked: achievements.includes("social") },
+    { id: "achiever", name: "Achiever", description: "Unlocked 3 achievements", icon: Crown, unlocked: achievements.length >= 3 }
+  ];
+
+  // Gamified interactions
+  const handleInteraction = (action: string, points: number = 10) => {
+    setGameScore(prev => prev + points);
+    const newLevel = Math.floor((gameScore + points) / 1000) + 1;
+    if (newLevel > level) {
+      setLevel(newLevel);
+      triggerAchievement(`Level ${newLevel} Reached!`);
+    }
+    
+    // Unlock achievements based on actions
+    if (action === "course_click" && !achievements.includes("learner")) {
+      setAchievements(prev => [...prev, "learner"]);
+      triggerAchievement("Eager Learner Unlocked!");
+    }
+  };
+
+  const triggerAchievement = (achievement: string) => {
+    setLatestAchievement(achievement);
+    setShowAchievement(true);
+    setTimeout(() => setShowAchievement(false), 3000);
+  };
 
   useEffect(() => {
     if (!loading && user) {
@@ -118,6 +159,9 @@ export default function HomeClient() {
 
   useEffect(() => {
     setIsLoaded(true);
+    
+    // Award initial points for visiting
+    setTimeout(() => handleInteraction("visit", 50), 1000);
     
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
@@ -145,6 +189,89 @@ export default function HomeClient() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-x-hidden">
+      {/* Achievement Notification */}
+      <AnimatePresence>
+        {showAchievement && (
+          <motion.div
+            initial={{ opacity: 0, y: -100, scale: 0.8 }}
+            animate={{ opacity: 1, y: 20, scale: 1 }}
+            exit={{ opacity: 0, y: -100, scale: 0.8 }}
+            className="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl shadow-2xl flex items-center space-x-3"
+          >
+            <Trophy className="h-6 w-6" />
+            <span className="font-bold">{latestAchievement}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Gamification HUD */}
+      <motion.div
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 2 }}
+        className="fixed top-4 left-4 z-40 bg-black/30 backdrop-blur-md border border-white/20 rounded-xl p-4 space-y-3"
+      >
+        {/* Level and XP */}
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+            <Crown className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <div className="text-white font-bold">Level {level}</div>
+            <div className="text-xs text-slate-300">{gameScore} XP</div>
+          </div>
+        </div>
+        
+        {/* XP Progress Bar */}
+        <div className="w-48 bg-slate-700 rounded-full h-2 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+            style={{ width: `${userLevelData.progress}%` }}
+            animate={{ width: `${userLevelData.progress}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
+        
+        {/* Quick Actions */}
+        <div className="flex space-x-2">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleInteraction("share", 25)}
+            className="w-8 h-8 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg flex items-center justify-center transition-colors"
+          >
+            <Users className="h-4 w-4 text-emerald-400" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleInteraction("like", 15)}
+            className="w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-lg flex items-center justify-center transition-colors"
+          >
+            <Flame className="h-4 w-4 text-red-400" />
+          </motion.button>
+        </div>
+      </motion.div>
+
+      {/* Login Button - Fixed Position */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="fixed top-4 right-4 z-50"
+      >
+        <Link
+          href="/login"
+          className="group flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          onClick={() => {
+            handleInteraction("login_click", 30);
+            trackEvent('header_login_click', {});
+          }}
+        >
+          <LogIn className="h-5 w-5" />
+          <span>Sign In</span>
+        </Link>
+      </motion.div>
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
@@ -258,18 +385,34 @@ export default function HomeClient() {
               className="grid grid-cols-2 md:grid-cols-4 gap-6"
               variants={heroVariants}
             >
-              {achievements.map((achievement, index) => (
+              {statsAchievements.map((achievement, index) => (
                 <motion.div
                   key={achievement.label}
-                  className="text-center"
+                  className="text-center group cursor-pointer"
                   animate={floatingAnimation}
                   transition={{ delay: index * 0.2 }}
+                  whileHover={{ scale: 1.1, y: -5 }}
+                  onClick={() => handleInteraction("stat_click", 20)}
                 >
-                  <div className={`w-12 h-12 mx-auto mb-2 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center ${achievement.color}`}>
-                    <achievement.icon className="w-6 h-6" />
+                  <motion.div 
+                    className={`w-16 h-16 mx-auto mb-3 rounded-full ${achievement.bgColor} backdrop-blur-sm flex items-center justify-center ${achievement.color} group-hover:shadow-lg transition-all`}
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    <achievement.icon className="w-8 h-8" />
+                  </motion.div>
+                  <div className="text-3xl font-bold text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
+                    {achievement.count}
                   </div>
-                  <div className="text-2xl font-bold text-white">{achievement.count}</div>
-                  <div className="text-sm text-slate-400">{achievement.label}</div>
+                  <div className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
+                    {achievement.label}
+                  </div>
+                  
+                  {/* Gamified hover effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={false}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -459,7 +602,10 @@ export default function HomeClient() {
                     <Link 
                       href={`/courses/${course.id}`}
                       className="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center group"
-                      onClick={() => trackEvent('course_click', { courseId: course.id, courseTitle: course.title })}
+                      onClick={() => {
+                        handleInteraction("course_click", 50);
+                        trackEvent('course_click', { courseId: course.id, courseTitle: course.title });
+                      }}
                     >
                       Explore
                       <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -479,7 +625,10 @@ export default function HomeClient() {
             <Link 
               href="/courses"
               className="inline-flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
-              onClick={() => trackEvent('view_all_courses_click', {})}
+              onClick={() => {
+                handleInteraction("view_all_courses", 30);
+                trackEvent('view_all_courses_click', {});
+              }}
             >
               View All Courses
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -524,30 +673,34 @@ export default function HomeClient() {
                 title: "Interactive Learning",
                 description: "Immersive experiences with real-time feedback, hands-on labs, and interactive simulations that make learning engaging and effective.",
                 color: "from-yellow-400 to-orange-500",
-                bgColor: "bg-yellow-500/10"
+                bgColor: "bg-yellow-500/10",
+                gameElement: "⚡ +50 XP per lesson"
               },
               {
                 icon: UserCog,
                 title: "Expert Instructors",
                 description: "Learn from industry veterans and blockchain pioneers who bring real-world experience and cutting-edge knowledge to every lesson.",
                 color: "from-blue-400 to-purple-500",
-                bgColor: "bg-blue-500/10"
+                bgColor: "bg-blue-500/10",
+                gameElement: "🎯 Unlock mentor badges"
               },
               {
                 icon: Award,
                 title: "Blockchain Certificates",
                 description: "Earn immutable, verifiable credentials stored on blockchain that prove your expertise and can be shared globally.",
                 color: "from-emerald-400 to-teal-500",
-                bgColor: "bg-emerald-500/10"
+                bgColor: "bg-emerald-500/10",
+                gameElement: "🏆 NFT Achievements"
               }
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
-                className="group relative bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-8 hover:border-slate-600/50 transition-all duration-500"
+                className="group relative bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-slate-700/30 rounded-2xl p-8 hover:border-slate-600/50 transition-all duration-500 cursor-pointer"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 whileHover={{ scale: 1.05, y: -10 }}
+                onClick={() => handleInteraction("feature_click", 25)}
               >
                 <motion.div 
                   className={`w-16 h-16 ${feature.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
@@ -560,12 +713,108 @@ export default function HomeClient() {
                   {feature.title}
                 </h3>
                 
-                <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
+                <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors mb-4">
                   {feature.description}
                 </p>
 
+                {/* Gamification element */}
+                <div className="text-sm font-semibold text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text opacity-0 group-hover:opacity-100 transition-opacity">
+                  {feature.gameElement}
+                </div>
+
+                {/* Interactive particles on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-purple-400 rounded-full"
+                      animate={{
+                        x: [0, Math.random() * 200 - 100],
+                        y: [0, Math.random() * 200 - 100],
+                        opacity: [1, 0]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: i * 0.5
+                      }}
+                      style={{
+                        left: "50%",
+                        top: "50%"
+                      }}
+                    />
+                  ))}
+                </div>
+
                 {/* Hover effect overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+      
+      {/* Achievements Section */}
+      <motion.section 
+        className="py-16 px-4 bg-gradient-to-r from-slate-900/80 to-purple-900/80 backdrop-blur-sm border-y border-purple-500/20"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+              Achievement Gallery
+            </h2>
+            <p className="text-slate-300">Unlock badges and rewards as you progress through your learning journey</p>
+          </motion.div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {availableAchievements.map((achievement, index) => (
+              <motion.div
+                key={achievement.id}
+                className={`text-center p-6 rounded-xl border-2 transition-all duration-300 ${
+                  achievement.unlocked 
+                    ? 'border-yellow-400/50 bg-yellow-400/10' 
+                    : 'border-slate-600/30 bg-slate-800/30'
+                }`}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ scale: achievement.unlocked ? 1.05 : 1.02 }}
+              >
+                <motion.div
+                  className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
+                    achievement.unlocked 
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black' 
+                      : 'bg-slate-700 text-slate-400'
+                  }`}
+                  animate={achievement.unlocked ? { rotate: [0, 5, -5, 0] } : {}}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <achievement.icon className="h-8 w-8" />
+                </motion.div>
+                <h3 className={`font-bold mb-2 ${achievement.unlocked ? 'text-yellow-400' : 'text-slate-500'}`}>
+                  {achievement.name}
+                </h3>
+                <p className={`text-sm ${achievement.unlocked ? 'text-slate-300' : 'text-slate-600'}`}>
+                  {achievement.description}
+                </p>
+                {achievement.unlocked && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mt-2 text-xs text-yellow-400 font-semibold"
+                  >
+                    ✨ UNLOCKED
+                  </motion.div>
+                )}
               </motion.div>
             ))}
           </div>
@@ -619,7 +868,10 @@ export default function HomeClient() {
               <Link 
                 href="/register" 
                 className="group relative px-10 py-5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-xl overflow-hidden shadow-2xl"
-                onClick={() => trackEvent('cta_register_click', { location: 'bottom_cta' })}
+                onClick={() => {
+                  handleInteraction("cta_register", 100);
+                  trackEvent('cta_register_click', { location: 'bottom_cta' });
+                }}
               >
                 <motion.div 
                   className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
@@ -638,7 +890,10 @@ export default function HomeClient() {
               <Link 
                 href="/login" 
                 className="px-10 py-5 bg-white/10 backdrop-blur-sm text-white font-bold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all shadow-lg text-lg"
-                onClick={() => trackEvent('cta_login_click', { location: 'bottom_cta' })}
+                onClick={() => {
+                  handleInteraction("cta_login", 50);
+                  trackEvent('cta_login_click', { location: 'bottom_cta' });
+                }}
               >
                 Sign In
               </Link>
@@ -648,27 +903,105 @@ export default function HomeClient() {
       </motion.section>
       
       {/* Footer */}
-      <footer className="py-8 px-4 bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50">
+      <footer className="py-12 px-4 bg-gradient-to-br from-slate-900/90 to-purple-900/90 backdrop-blur-sm border-t border-purple-500/20">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand Section */}
+            <div className="col-span-1 md:col-span-2">
+              <motion.h3 
+                className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4"
+                whileHover={{ scale: 1.05 }}
+              >
                 NounLogic
-              </h3>
-              <p className="text-slate-400 text-sm mt-1">The Future of Web3 Education</p>
+              </motion.h3>
+              <p className="text-slate-300 text-lg mb-4">The Future of Web3 Education</p>
+              <p className="text-slate-400 text-sm leading-relaxed max-w-md">
+                Join the revolution in decentralized learning. Master blockchain technology, 
+                earn verifiable credentials, and become part of the Web3 ecosystem.
+              </p>
+              
+              {/* Social Proof */}
+              <div className="flex items-center space-x-4 mt-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-slate-400">2,847 active learners</span>
+                </div>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-6">
-              <Link href="/about" className="text-slate-400 hover:text-white transition-colors">About</Link>
-              <Link href="/contact" className="text-slate-400 hover:text-white transition-colors">Contact</Link>
-              <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors">Privacy</Link>
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+              <div className="space-y-2">
+                {[
+                  { name: "Courses", href: "/courses" },
+                  { name: "Institutions", href: "/institutions" },
+                  { name: "Dashboard", href: "/dashboard" },
+                  { name: "Web3 Tools", href: "/web3" }
+                ].map((link) => (
+                  <Link 
+                    key={link.name}
+                    href={link.href} 
+                    className="block text-slate-400 hover:text-purple-400 transition-colors text-sm"
+                    onClick={() => handleInteraction("footer_link", 10)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            
+            {/* Support */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Support</h4>
+              <div className="space-y-2">
+                {[
+                  { name: "Help Center", href: "/help" },
+                  { name: "Contact", href: "/contact" },
+                  { name: "Privacy Policy", href: "/privacy" },
+                  { name: "Terms of Service", href: "/terms" }
+                ].map((link) => (
+                  <Link 
+                    key={link.name}
+                    href={link.href} 
+                    className="block text-slate-400 hover:text-purple-400 transition-colors text-sm"
+                    onClick={() => handleInteraction("footer_link", 10)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
           
-          <div className="border-t border-slate-700/50 mt-8 pt-8 text-center">
-            <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} NounLogic LMS. Powered by blockchain technology.
-            </p>
+          {/* Bottom Section */}
+          <div className="border-t border-slate-700/50 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div className="flex items-center space-x-4">
+                <p className="text-slate-500 text-sm">
+                  © {new Date().getFullYear()} NounLogic LMS. Powered by blockchain technology.
+                </p>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="hidden md:block"
+                >
+                  <Shield className="h-5 w-5 text-green-400" />
+                </motion.div>
+              </div>
+              
+              {/* Gamification Footer Stats */}
+              <div className="flex items-center space-x-6 text-sm">
+                <div className="flex items-center space-x-2">
+                  <Coins className="h-4 w-4 text-yellow-400" />
+                  <span className="text-slate-400">Earn XP while learning</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Trophy className="h-4 w-4 text-orange-400" />
+                  <span className="text-slate-400">Collect achievements</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
