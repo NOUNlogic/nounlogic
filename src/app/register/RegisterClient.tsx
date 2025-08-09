@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Mail, User, Lock, Building, UserCheck, Wallet, CheckCircle, Eye, EyeOff, Sparkles, Crown, Shield, Home, ArrowRight, ArrowLeft, Star, Zap, Rocket, Gem } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { Button, Input } from '@/components/ui';
+import { connectWallet, isWalletAvailable } from '@/lib/web3/wallet';
 import {
   Card,
   CardHeader,
@@ -17,6 +18,12 @@ import {
 } from '@/components/ui/CardComponents';
 
 const RegisterClient = () => {
+  // Wallet integration state
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+
+  // ...rest of state
   const [formAnimation, setFormAnimation] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -722,21 +729,49 @@ const RegisterClient = () => {
                         Connect your MetaMask or other Web3 wallet to register using your blockchain identity. Fast, secure, and decentralized.
                       </p>
                       
-                      <Button
-                        type="button"
-                        className="w-full h-12 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-semibold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300"
-                        disabled={isLoading}
-                        onClick={() => {
-                          // Simulate wallet connection and then show form
-                          setRegisterMethod('email');
-                          setFormData(prev => ({
-                            ...prev,
-                            email: '0x71C7...F9E2@web3.user',
-                          }));
-                        }}
-                      >
-                        {isLoading ? 'Connecting...' : 'Connect Wallet'}
-                      </Button>
+                      {!walletAddress ? (
+  <Button
+    type="button"
+    className="w-full h-12 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-semibold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-300"
+    disabled={walletLoading}
+    onClick={async () => {
+      setWalletLoading(true);
+      setWalletError(null);
+      const result = await connectWallet();
+      setWalletLoading(false);
+      if ('address' in result) {
+        setWalletAddress(result.address);
+        setFormData(prev => ({
+          ...prev,
+          email: `${result.address}@web3.user`,
+        }));
+        setRegisterMethod('email'); // Switch to email form after connect
+      } else {
+        setWalletError(result.error);
+      }
+    }}
+  >
+    {walletLoading ? 'Connecting...' : 'Connect Wallet'}
+  </Button>
+) : (
+  <div className="flex flex-col items-center gap-2">
+    <div className="text-green-400 font-mono text-sm break-all">Connected: {walletAddress}</div>
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full"
+      onClick={() => {
+        setWalletAddress(null);
+        setFormData(prev => ({ ...prev, email: '' }));
+      }}
+    >
+      Disconnect
+    </Button>
+  </div>
+)}
+{walletError && (
+  <div className="text-red-400 text-sm mt-2">{walletError}</div>
+)}
                     </div>
                     
                     <p className="text-sm text-white/60 text-center">

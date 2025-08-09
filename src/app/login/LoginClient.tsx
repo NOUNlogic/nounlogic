@@ -6,8 +6,14 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Mail, Lock, ArrowRight, Wallet, Eye, EyeOff, Sparkles, Shield, Crown, Zap, Home } from 'lucide-react';
 import { useAuth } from '@/app/providers';
+import { connectWallet, isWalletAvailable } from '@/lib/web3/wallet';
 
 const LoginClient = () => {
+  // Wallet integration state
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+
   const router = useRouter();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -406,19 +412,61 @@ const LoginClient = () => {
                         Use your Web3 wallet to securely sign in to your account
                       </p>
                       
-                      <motion.button
-                        type="submit"
-                        disabled={isLoading}
-                        className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white font-bold rounded-xl overflow-hidden shadow-2xl disabled:opacity-50"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <span className="relative flex items-center justify-center gap-2">
-                          <Zap className="h-5 w-5" />
-                          Connect Wallet
-                        </span>
-                      </motion.button>
-                    </div>
+{!walletAddress ? (
+  <motion.button
+    type="button"
+    disabled={walletLoading}
+    className="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-600 text-white font-bold rounded-xl overflow-hidden shadow-2xl disabled:opacity-50"
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={async () => {
+      setWalletLoading(true);
+      setWalletError(null);
+      const result = await connectWallet();
+      setWalletLoading(false);
+      if ('address' in result) {
+        setWalletAddress(result.address);
+        setError('');
+        // Simulate login with wallet address as email
+        try {
+          setIsLoading(true);
+          await login(`${result.address}@web3.user`, '');
+          setShowSuccessAnimation(true);
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 1500);
+        } catch (err: any) {
+          setError(err?.message || 'Wallet login failed');
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setWalletError(result.error);
+      }
+    }}
+  >
+    <span className="relative flex items-center justify-center gap-2">
+      <Zap className="h-5 w-5" />
+      {walletLoading ? 'Connecting...' : 'Connect Wallet'}
+    </span>
+  </motion.button>
+) : (
+  <div className="flex flex-col items-center gap-2">
+    <div className="text-green-400 font-mono text-sm break-all">Connected: {walletAddress}</div>
+    <motion.button
+      type="button"
+      className="w-full py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all"
+      onClick={() => {
+        setWalletAddress(null);
+      }}
+    >
+      Disconnect
+    </motion.button>
+  </div>
+)}
+{walletError && (
+  <div className="text-red-400 text-sm mt-2">{walletError}</div>
+)}                    </div>
                   </motion.div>
                 )}
               </form>
