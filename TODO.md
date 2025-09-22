@@ -10,24 +10,25 @@ The primary objective of this phase is to build the core platform and onboard th
 ### Core Platform Infrastructure
 - [ ] **Authentication:**
   - [x] Implement email/password login (`/login`, `/register`).
-  - [ ] Implement social login (Google).
-  - [ ] Set up user roles and permissions (Student, Instructor, Admin).
+  - [x] Implement social login (Google).
+  - [x] Set up user roles and permissions (Student, Instructor, Admin).
 - [ ] **Database Schema:**
   - [x] Define initial schema for Users and Profiles (`/src/types/database.ts`).
-  - [ ] Define schema for Courses, Modules, and Lessons.
-  - [ ] Define schema for Enrollments and User Progress.
+  - [x] Define schema for Courses, Modules, and Lessons.
+  - [x] Define schema for Enrollments and User Progress.
 - [ ] **Institutional Management (Admin Dashboard V1):**
-  - [ ] Create a new route `/admin` for the admin dashboard.
-  - [ ] Build UI for managing users (create, update, assign roles).
-  - [ ] Develop functionality for creating and managing institutional portals (branding, user cohorts).
+  - [x] Create a new route `/admin` for the admin dashboard.
+  - [x] Build UI for managing users (create, update, assign roles).
+  - [x] Develop functionality for creating and managing institutional portals (branding, user cohorts).
 - [ ] **API Development:**
-  - [ ] Develop API routes (`/src/app/api/...`) for all core functionalities.
-  - [ ] Secure API routes based on user roles.
+  - [x] Develop API routes (`/src/app/api/...`) for all core functionalities.
+  - [x] Secure API routes based on user roles.
 
 ### Instructor/Creator Experience (The "Studio" V1)
 - [ ] **Course Authoring Environment:**
-  - [ ] Create a new route `/studio` for the instructor environment.
-  - [ ] Design a modular, drag-and-drop interface for structuring courses (weeks, topics).
+  - [x] Create a new route `/studio` for the instructor environment.
+  - [x] Design a modular, drag-and-drop interface for structuring courses (weeks, topics).
+  - [ ] Implement drag-and-drop for lessons within modules.
   - [ ] Implement a Rich Content Editor for creating lesson content (text, images, embeds).
 - [ ] **Assessment Tools (Basic):**
   - [ ] Develop functionality to create and manage multiple-choice quizzes.

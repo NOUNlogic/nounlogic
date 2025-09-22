@@ -15,7 +15,7 @@ const LoginClient = () => {
   const [walletLoading, setWalletLoading] = useState(false);
 
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'email' | 'wallet'>('email');
   const [email, setEmail] = useState('');
@@ -470,6 +470,40 @@ const LoginClient = () => {
                   </motion.div>
                 )}
               </form>
+
+              {/* Divider */}
+              <motion.div 
+                className="relative my-8"
+                variants={itemVariants}
+              >
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/20"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-slate-900/80 px-4 text-slate-400">
+                    Or continue with
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Google Sign-In Button */}
+              <motion.div variants={itemVariants}>
+                <motion.button
+                  type="button"
+                  onClick={() => signInWithGoogle()}
+                  className="w-full py-3 bg-white/5 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25C22.56 11.42 22.49 10.62 22.36 9.84H12.27V14.45H18.03C17.76 15.99 16.93 17.32 15.62 18.21V21.09H19.46C21.53 19.19 22.56 16.08 22.56 12.25Z" fill="#4285F4"/>
+                    <path d="M12.27 23C15.12 23 17.52 22.09 19.46 20.6L15.62 17.71C14.67 18.36 13.56 18.73 12.27 18.73C9.73 18.73 7.57 17.03 6.75 14.69H2.82V17.58C4.76 21.04 8.28 23 12.27 23Z" fill="#34A853"/>
+                    <path d="M6.75 14.69C6.55 14.08 6.43 13.44 6.43 12.79C6.43 12.14 6.55 11.5 6.75 10.89V8H2.82C1.91 9.79 1.42 11.74 1.42 13.79C1.42 15.84 1.91 17.79 2.82 19.58L6.75 16.69V14.69Z" fill="#FBBC05"/>
+                    <path d="M12.27 6.27C13.67 6.27 14.82 6.74 15.62 7.49L19.54 3.57C17.52 1.64 15.12 0.580002 12.27 0.580002C8.28 0.580002 4.76 2.96 2.82 6.42L6.75 9.31C7.57 6.97 9.73 5.27 12.27 5.27Z" fill="#EA4335"/>
+                  </svg>
+                  Sign in with Google
+                </motion.button>
+              </motion.div>
 
               {/* Divider */}
               <motion.div 

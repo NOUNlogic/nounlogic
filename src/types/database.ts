@@ -23,8 +23,11 @@ export interface User {
   user_id: string;
   email: string;
   profile: string; // JSON stored as string
+  /** @deprecated Use roles instead */
   role_id: string;
+  roles: string[]; // Array of role names
   institution_id: string;
+  cohort_id?: string;
   wallet_address?: string;
   $createdAt: string;
   $updatedAt: string;
@@ -49,6 +52,7 @@ export interface Course {
   institution_id: string;
   creator_id: string;
   metadata: string; // JSON stored as string
+  cohort_ids?: string[];
   nft_contract_address?: string;
   $createdAt: string;
   $updatedAt: string;
@@ -115,6 +119,8 @@ export interface Institution {
   name: string;
   type: string;
   metadata: string; // JSON stored as string
+  logo_url?: string;
+  primary_color?: string;
   $createdAt: string;
   $updatedAt: string;
 }
@@ -226,6 +232,16 @@ export interface NFTContract {
   course_id: string;
   network: string;
   metadata: string; // JSON stored as string
+  $createdAt: string;
+  $updatedAt: string;
+}
+
+export interface Cohort {
+  $id: string;
+  name: string;
+  institution_id: string;
+  user_ids: string[];
+  course_ids: string[];
   $createdAt: string;
   $updatedAt: string;
 }

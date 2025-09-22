@@ -20,7 +20,8 @@ import type {
   Certificate,
   NFTContract,
   Role,
-  Setting
+  Setting,
+  Cohort
 } from '@/types/database';
 
 // Core Database Services
@@ -250,6 +251,31 @@ export const institutionsService = {
     );
   },
 
+  async getInstitutionById(institutionId: string) {
+    return await appwriteDatabases.getDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.INSTITUTIONS,
+      institutionId
+    );
+  },
+
+  async updateInstitution(institutionId: string, institutionData: Partial<Institution>) {
+    return await appwriteDatabases.updateDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.INSTITUTIONS,
+      institutionId,
+      institutionData
+    );
+  },
+
+  async deleteInstitution(institutionId: string) {
+    return await appwriteDatabases.deleteDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.INSTITUTIONS,
+      institutionId
+    );
+  },
+
   async createInstitution(institutionData: Partial<Institution>) {
     return await appwriteDatabases.createDocument(
       DATABASE_IDS.INSTITUTIONS,
@@ -260,6 +286,55 @@ export const institutionsService = {
         name: institutionData.name!,
         type: institutionData.type!,
         metadata: JSON.stringify(institutionData.metadata || {})
+      }
+    );
+  }
+};
+
+// Cohorts Database Services
+export const cohortsService = {
+  async listCohorts() {
+    return await appwriteDatabases.listDocuments(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.COHORTS
+    );
+  },
+
+  async getCohortById(cohortId: string) {
+    return await appwriteDatabases.getDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.COHORTS,
+      cohortId
+    );
+  },
+
+  async updateCohort(cohortId: string, cohortData: Partial<Cohort>) {
+    return await appwriteDatabases.updateDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.COHORTS,
+      cohortId,
+      cohortData
+    );
+  },
+
+  async deleteCohort(cohortId: string) {
+    return await appwriteDatabases.deleteDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.COHORTS,
+      cohortId
+    );
+  },
+
+  async createCohort(cohortData: Partial<Cohort>) {
+    return await appwriteDatabases.createDocument(
+      DATABASE_IDS.INSTITUTIONS,
+      COLLECTION_IDS.COHORTS,
+      ID.unique(),
+      {
+        name: cohortData.name!,
+        institution_id: cohortData.institution_id!,
+        user_ids: JSON.stringify(cohortData.user_ids || []),
+        course_ids: JSON.stringify(cohortData.course_ids || [])
       }
     );
   }

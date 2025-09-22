@@ -11,6 +11,8 @@ interface AppwriteUser {
   email: string;
   name?: string;
   databaseUser?: DatabaseUser;
+  roles: string[];
+  permissions: string[];
 }
 
 interface AppwriteAuthContextType {
@@ -19,6 +21,7 @@ interface AppwriteAuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -39,19 +42,21 @@ export const AppwriteAuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const account = await appwriteAccount.get();
       
-      // Try to get database user info if available
-      let databaseUser = null;
+      let databaseUser: DatabaseUser | null = null;
+      let roles: string[] = [];
+      let permissions: string[] = [];
+
       try {
         const userResponse = await usersService.getUserById(account.$id);
         databaseUser = userResponse;
+        roles = databaseUser.roles || [];
+        permissions = roles.flatMap(role => ROLE_PERMISSIONS[role] || []);
       } catch (error) {
-        // User might not exist in database yet, that's okay
         console.log('Database user not found, will create on next login');
       }
       
-      setUser({ ...account, databaseUser });
+      setUser({ ...account, databaseUser, roles, permissions });
       
-      // Track login event if analytics enabled
       if (FEATURE_FLAGS.ANALYTICS_ENABLED) {
         try {
           await analyticsService.createEvent({
@@ -89,9 +94,66 @@ export const AppwriteAuthProvider = ({ children }: { children: ReactNode }) => {
     await login(email, password);
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      await appwriteAccount.createOAuth2Session(
+        'google',
+        `${window.location.origin}/dashboard`,
+        `${window.location.origin}/login?error=google_oauth_failed`
+      );
+    } catch (error) {
+      console.error('Google sign-in failed', error);
+      // Redirect to login page with an error message
+      window.location.href = '/login?error=google_oauth_failed';
+    }
+  };
+
   return (
-    <AppwriteAuthContext.Provider value={{ user, loading, login, logout, register, refresh }}>
+    <AppwriteAuthContext.Provider value={{ user, loading, login, logout, register, signInWithGoogle, refresh }}>
       {children}
     </AppwriteAuthContext.Provider>
   );
+};
+
+// This is a higher-order component that can be used to protect pages
+export const withAuth = (WrappedComponent: React.ComponentType) => {
+  return (props: any) => {
+    const { user, loading } = useAppwriteAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!loading && !user) {
+        router.replace('/login');
+      }
+    }, [user, loading, router]);
+
+    if (loading || !user) {
+      return <div>Loading...</div>; // Or a spinner component
+    }
+
+    return <WrappedComponent {...props} />;
+  };
+};
+
+// This is a hook that can be used in components to get the current user
+export const useAuth = () => {
+  const context = useContext(AppwriteAuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AppwriteAuthProvider');
+  }
+  return context;
+};
+
+export const usePermissions = () => {
+  const { user } = useAuth();
+
+  const hasPermission = (permission: string) => {
+    return user?.permissions.includes(permission) ?? false;
+  };
+
+  const hasRole = (role: string) => {
+    return user?.roles.includes(role) ?? false;
+  };
+
+  return { hasPermission, hasRole };
 };
