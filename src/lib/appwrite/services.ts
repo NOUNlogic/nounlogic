@@ -226,6 +226,18 @@ export const coursesService = {
   },
 
   async createEnrollment(enrollmentData: Partial<Enrollment>) {
+    // Duplicate guard: check if user already enrolled in course
+    const existing = await appwriteDatabases.listDocuments(
+      DATABASE_IDS.COURSES,
+      COLLECTION_IDS.ENROLLMENTS,
+      [
+        Query.equal('user_id', enrollmentData.user_id!),
+        Query.equal('course_id', enrollmentData.course_id!)
+      ]
+    );
+    if (existing.total > 0) {
+      return existing.documents[0];
+    }
     return await appwriteDatabases.createDocument(
       DATABASE_IDS.COURSES,
       COLLECTION_IDS.ENROLLMENTS,

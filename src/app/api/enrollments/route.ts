@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     const enrollment = await coursesService.createEnrollment({ user_id, course_id });
-    return NextResponse.json(enrollment);
+    return NextResponse.json(enrollment, { status: 201 });
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to create enrollment' }), {
       status: 500,
