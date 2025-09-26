@@ -38,7 +38,7 @@ The primary objective of this phase is to build the core platform and onboard th
 
 ### Learner Experience (The "Student Portal" V1)
 - [ ] **Course Enrollment & Access:**
-  - [ ] Implement logic for students to enroll in courses.
+  - [x] Implement basic enrollment API and UI (needs auth integration)
   - [ ] Develop the course-taking interface (`/courses/[courseId]/lessons/[lessonId]`).
 - [ ] **Learning Environment:**
   - [ ] Implement a clean, distraction-free UI for consuming lesson content.
