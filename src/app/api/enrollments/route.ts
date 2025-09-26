@@ -18,7 +18,9 @@ export async function POST(request: Request) {
     }
 
     const enrollment = await coursesService.createEnrollment({ user_id, course_id });
-    return NextResponse.json(enrollment, { status: 201 });
+    const isExisting = (enrollment as any).__existing === true;
+    const statusCode = isExisting ? 200 : 201;
+    return NextResponse.json({ ...enrollment, existing: isExisting }, { status: statusCode });
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to create enrollment' }), {
       status: 500,

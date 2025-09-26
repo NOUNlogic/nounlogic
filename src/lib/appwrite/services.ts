@@ -104,8 +104,38 @@ export const usersService = {
         profile: JSON.stringify(userData.profile || {}),
         role_id: userData.role_id!,
         institution_id: userData.institution_id!,
-        wallet_address: userData.wallet_address
+        wallet_address: userData.wallet_address,
+        roles: (userData as any).roles || []
       }
+    );
+  },
+
+  async listUsers() {
+    return await appwriteDatabases.listDocuments(
+      DATABASE_IDS.USERS,
+      COLLECTION_IDS.USERS
+    );
+  },
+
+  async updateUser(userId: string, updates: any) {
+    // Normalize roles if provided
+    const payload = { ...updates };
+    if (payload.roles && !Array.isArray(payload.roles)) {
+      payload.roles = [payload.roles];
+    }
+    return await appwriteDatabases.updateDocument(
+      DATABASE_IDS.USERS,
+      COLLECTION_IDS.USERS,
+      userId,
+      payload
+    );
+  },
+
+  async deleteUser(userId: string) {
+    return await appwriteDatabases.deleteDocument(
+      DATABASE_IDS.USERS,
+      COLLECTION_IDS.USERS,
+      userId
     );
   },
 
@@ -225,7 +255,7 @@ export const coursesService = {
     );
   },
 
-  async createEnrollment(enrollmentData: Partial<Enrollment>) {
+    async createEnrollment(enrollmentData: Partial<Enrollment>) {
     // Duplicate guard: check if user already enrolled in course
     const existing = await appwriteDatabases.listDocuments(
       DATABASE_IDS.COURSES,
@@ -236,9 +266,12 @@ export const coursesService = {
       ]
     );
     if (existing.total > 0) {
-      return existing.documents[0];
+      // Attach flag so API can convey duplication explicitly
+      return { ...existing.documents[0], __existing: true } as any;
     }
-    return await appwriteDatabases.createDocument(
+    // Initialize progress scaffold
+    const initialProgress = enrollmentData.progress || { completedLessons: [], lastAccessed: null };
+    const created = await appwriteDatabases.createDocument(
       DATABASE_IDS.COURSES,
       COLLECTION_IDS.ENROLLMENTS,
       ID.unique(),
@@ -247,10 +280,11 @@ export const coursesService = {
         user_id: enrollmentData.user_id!,
         course_id: enrollmentData.course_id!,
         status: enrollmentData.status || 'active',
-        progress: JSON.stringify(enrollmentData.progress || {}),
+        progress: JSON.stringify(initialProgress),
         certificate_token_id: enrollmentData.certificate_token_id
       }
     );
+    return { ...created, __existing: false } as any;
   }
 };
 
@@ -272,11 +306,12 @@ export const institutionsService = {
   },
 
   async updateInstitution(institutionId: string, institutionData: Partial<Institution>) {
+    const { $id, $createdAt, $updatedAt, ...payload } = institutionData as any;
     return await appwriteDatabases.updateDocument(
       DATABASE_IDS.INSTITUTIONS,
       COLLECTION_IDS.INSTITUTIONS,
       institutionId,
-      institutionData
+      payload
     );
   },
 
@@ -321,11 +356,12 @@ export const cohortsService = {
   },
 
   async updateCohort(cohortId: string, cohortData: Partial<Cohort>) {
+    const { $id, $createdAt, $updatedAt, ...payload } = cohortData as any;
     return await appwriteDatabases.updateDocument(
       DATABASE_IDS.INSTITUTIONS,
       COLLECTION_IDS.COHORTS,
       cohortId,
-      cohortData
+      payload
     );
   },
 

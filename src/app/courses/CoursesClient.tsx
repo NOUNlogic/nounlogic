@@ -33,6 +33,9 @@ const CoursesClient = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [bookmarkedCourses, setBookmarkedCourses] = useState<string[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -48,8 +51,8 @@ const CoursesClient = () => {
     }
   };
 
-  // Mock course data
-  const courses = [
+  // Fallback mock courses (used only if API request fails)
+  const fallbackCourses = [
     {
       id: '1',
       courseId: '1',
@@ -154,6 +157,50 @@ const CoursesClient = () => {
     },
   ];
 
+  // Fetch real courses from API
+  useEffect(() => {
+    async function loadCourses() {
+      setLoading(true);
+      setLoadError(null);
+      try {
+        const res = await fetch('/api/courses');
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        const docs = Array.isArray(data) ? data : (data.documents || []);
+        const mapped = docs.map((doc: any, idx: number) => {
+          let meta: any = {};
+          try {
+            meta = typeof doc.metadata === 'string' ? JSON.parse(doc.metadata) : (doc.metadata || {});
+          } catch {}
+          return {
+            id: doc.$id || doc.course_id || doc.id || String(idx),
+            courseId: doc.course_id || doc.$id || doc.id || String(idx),
+            title: doc.title || 'Untitled Course',
+            description: doc.description || '',
+            instructor: doc.creator_id || meta.instructor || 'Unknown Instructor',
+            institution: doc.institution_id || meta.institution || 'Unknown Institution',
+            enrolled: meta.enrolled || 0,
+            rating: meta.rating || 0,
+            duration: meta.duration || 'Self-paced',
+            level: meta.level || 'Beginner',
+            category: meta.category || 'programming',
+            image: meta.image || 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Course',
+            hasNFT: !!doc.nft_contract_address,
+            popular: meta.popularity || 0,
+            tags: Array.isArray(meta.tags) ? meta.tags : []
+          };
+        });
+        setCourses(mapped);
+      } catch (e: any) {
+        setLoadError(e.message || 'Failed to load courses');
+        setCourses(fallbackCourses);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCourses();
+  }, []);
+
   // Categories for filtering
   const categories = [
     { id: 'all', name: 'All Courses', icon: <BookOpen size={16} /> },
@@ -184,7 +231,7 @@ const CoursesClient = () => {
       const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             course.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            course.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                             course.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       
       const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
       const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
@@ -379,7 +426,7 @@ const CoursesClient = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
                     <div className="p-4 w-full">
                       <div className="flex gap-1 mb-2">
-                        {course.tags.map((tag, index) => (
+                        {course.tags.map((tag: string, index: number) => (
                           <span key={index} className="px-2 py-0.5 bg-white/20 text-white text-xs rounded backdrop-blur-sm">
                             {tag}
                           </span>
