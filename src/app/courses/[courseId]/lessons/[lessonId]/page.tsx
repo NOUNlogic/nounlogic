@@ -2,7 +2,7 @@ import React from 'react';
 import LessonViewClient from './LessonViewClient';
 
 export const metadata = {
-  title: 'Lesson | NounLogic LMS',
+  title: 'Lesson | NounLogic',
   description: 'View lesson content',
 };
 
