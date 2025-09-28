@@ -68,9 +68,9 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
         
         <div className="hidden md:block">
           <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-            NounLogic LMS
+            NounLogic
           </h1>
-          <p className="text-sm text-muted-foreground">Web3 Learning Platform</p>
+          <p className="text-sm text-muted-foreground">Social Learning Network</p>
         </div>
         
         {/* Mobile Logo */}

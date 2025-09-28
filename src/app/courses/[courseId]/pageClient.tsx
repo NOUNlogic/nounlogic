@@ -18,7 +18,7 @@ export default function CourseDetailClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    async function fetchCourse() {
       if (!courseId) return;
       setLoading(true);
       try {
@@ -31,7 +31,7 @@ export default function CourseDetailClient() {
       } finally {
         setLoading(false);
       }
-  }, [user, courseId]);
+    }
     fetchCourse();
   }, [courseId]);
 
@@ -52,13 +52,18 @@ export default function CourseDetailClient() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Enrollment failed');
       }
-      setEnrolled(true);
+      const data = await res.json().catch(() => ({}));
+      if (data.existing) {
+        setEnrolled(true); // Already enrolled
+      } else {
+        setEnrolled(true);
+      }
     } catch (e: any) {
       setError(e.message);
     } finally {
       setEnrolling(false);
     }
-  };
+  }, [user, courseId]);
 
   return (
     <MainLayout>
@@ -78,8 +83,14 @@ export default function CourseDetailClient() {
             </div>
             <div className="flex items-center gap-4">
               <Button onClick={handleEnroll} disabled={authLoading || enrolling || enrolled || !user}>
-                {authLoading ? 'Checking auth...' : enrolled ? 'Enrolled' : enrolling ? 'Enrolling...' : user ? 'Enroll' : 'Login to Enroll'}
+                {authLoading ? 'Checking auth...' : enrolling ? 'Enrolling...' : enrolled ? 'Enrolled' : user ? 'Enroll' : 'Login to Enroll'}
               </Button>
+              {enrolled && !error && (
+                <span className="text-xs text-green-600">
+                  {/** If enrollment existed already we still just show Enrolled for now. Could differentiate later */}
+                  You are enrolled in this course.
+                </span>
+              )}
               {error && <span className="text-sm text-red-600">{error}</span>}
             </div>
             <p className="text-xs text-muted-foreground">Course ID: {courseId}</p>

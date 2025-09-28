@@ -388,6 +388,56 @@ const CoursesClient = () => {
           )}
         </div>
 
+        {loadError && (
+          <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-sm text-red-700 dark:text-red-300 flex items-start justify-between gap-4">
+            <div>
+              <strong className="font-medium">Using fallback data:</strong> {loadError}
+            </div>
+            <button
+              onClick={() => {
+                // retry fetch
+                (async () => {
+                  try {
+                    const res = await fetch('/api/courses');
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+                    const data = await res.json();
+                    const docs = Array.isArray(data) ? data : (data.documents || []);
+                    const mapped = docs.map((doc: any, idx: number) => {
+                      let meta: any = {};
+                      try {
+                        meta = typeof doc.metadata === 'string' ? JSON.parse(doc.metadata) : (doc.metadata || {});
+                      } catch {}
+                      return {
+                        id: doc.$id || doc.course_id || doc.id || String(idx),
+                        courseId: doc.course_id || doc.$id || doc.id || String(idx),
+                        title: doc.title || 'Untitled Course',
+                        description: doc.description || '',
+                        instructor: doc.creator_id || meta.instructor || 'Unknown Instructor',
+                        institution: doc.institution_id || meta.institution || 'Unknown Institution',
+                        enrolled: meta.enrolled || 0,
+                        rating: meta.rating || 0,
+                        duration: meta.duration || 'Self-paced',
+                        level: meta.level || 'Beginner',
+                        category: meta.category || 'programming',
+                        image: meta.image || 'https://via.placeholder.com/300x200/4f46e5/ffffff?text=Course',
+                        hasNFT: !!doc.nft_contract_address,
+                        popular: meta.popularity || 0,
+                        tags: Array.isArray(meta.tags) ? meta.tags : []
+                      };
+                    });
+                    setCourses(mapped);
+                    setLoadError(null);
+                  } catch (e: any) {
+                    setLoadError(e.message || 'Failed to load courses');
+                  }
+                })();
+              }}
+              className="text-xs underline hover:no-underline"
+            >Retry</button>
+          </div>
+        )}
+
+
         {/* Results summary */}
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">

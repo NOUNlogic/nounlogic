@@ -2,7 +2,7 @@ import React from 'react';
 import RegisterClient from './RegisterClient';
 
 export const metadata = {
-  title: 'Register | NounLogic LMS',
+  title: 'Register | NounLogic',
   description: 'Create a new account',
 };
 

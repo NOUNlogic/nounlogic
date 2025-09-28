@@ -2,7 +2,7 @@ import React from 'react';
 import InstitutionsClient from './InstitutionsClient';
 
 export const metadata = {
-  title: 'Institutions | NounLogic LMS',
+  title: 'Institutions | NounLogic',
   description: 'Browse and manage institutions',
 };
 

@@ -1,10 +1,10 @@
 # NounLogic + Sensay Hackathon Submission
 
-This project integrates Sensay's Wisdom Engine with NounLogic Learning Management System to create an AI-powered educational experience.
+This project integrates Sensay's Wisdom Engine with NounLogic to create an AI-powered social learning experience.
 
 ## Project Overview
 
-NounLogic is a modern, feature-rich Learning Management System that has been enhanced with Sensay's AI technology to provide personalized learning experiences for students. The integration focuses on creating an AI Teaching Assistant that helps answer student questions, provides personalized explanations, and guides learners through difficult concepts.
+NounLogic is a modern, feature-rich social learning network enhanced with Sensay's AI technology to provide personalized learning experiences for students. The integration focuses on creating an AI Teaching Assistant that helps answer student questions, provides personalized explanations, and guides learners through difficult concepts and peer collaboration.
 
 ## Sensay Integration Features
 
@@ -21,14 +21,14 @@ The application uses Sensay's API to:
 1. Create customized AI replicas for different educational roles (teaching assistant, subject expert, learning coach)
 2. Maintain conversational context for personalized learning experiences
 3. Provide topic-specific expertise in blockchain, Web3, and related technologies
-4. Enhance the existing LMS with AI-powered learning assistance
+4. Enhance the social learning experience with AI-powered assistance
 
 ## Technical Implementation
 
 - React components for AI chat interface
 - Context-based state management for Sensay API integration
 - Custom hooks for educational use cases
-- Integration with the existing NounLogic LMS architecture
+- Integration with the existing NounLogic architecture
 - Responsive design that works across all device sizes
 
 ## Hackathon Requirements Met
@@ -39,7 +39,7 @@ The integration addresses the need for personalized education by providing AI as
 ### Milestones for Development
 
 **Milestone 1: Core Integration**
-- ✅ Sensay API integration with NounLogic LMS
+- ✅ Sensay API integration with NounLogic
 - ✅ Basic chat interface for student-AI interaction
 - ✅ Different AI roles (Teaching Assistant, Subject Expert, Learning Coach)
 

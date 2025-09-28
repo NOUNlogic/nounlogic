@@ -2,7 +2,7 @@ import React from 'react';
 import CoursesClient from './CoursesClient';
 
 export const metadata = {
-  title: 'Courses | NounLogic LMS',
+  title: 'Courses | NounLogic',
   description: 'Browse and manage courses',
 };
 

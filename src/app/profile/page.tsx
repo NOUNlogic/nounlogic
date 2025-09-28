@@ -2,7 +2,7 @@ import React from 'react';
 import ProfileClient from './ProfileClient';
 
 export const metadata = {
-  title: 'Profile | NounLogic LMS',
+  title: 'Profile | NounLogic',
   description: 'View and edit your profile',
 };
 

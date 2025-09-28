@@ -6,8 +6,8 @@ import AppProviders from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'NounLogic LMS',
-  description: 'Web3 Learning Management System',
+  title: 'NounLogic',
+  description: 'Social learning network to connect students and communities',
 };
 
 export default function RootLayout({

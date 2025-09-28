@@ -1,6 +1,6 @@
-# NounLogic Learning Management System
+# NounLogic — Social Learning Network
 
-A modern, feature-rich Learning Management System with Web3/Sensay integration.
+A modern, feature-rich social learning network with Web3/Sensay integration.
 
 ## Features
 
@@ -10,6 +10,10 @@ A modern, feature-rich Learning Management System with Web3/Sensay integration.
 - **Dark/Light Themes**: Automatic theme switching with system preferences
 - **Optimized Mobile Experience**: Touch-friendly interfaces and gestures
 - **Web3 Integration**: Blockchain certificates and wallet connectivity
+- **Social Feed**: Share updates, projects, and milestones with peers
+- **Connections**: Follow classmates, mentors, and communities
+- **Messaging**: Direct messages and group chats (scaffolded)
+- **Communities**: Join interest-based groups and events
 - **Course Management**: Create, manage, and enroll in courses
 - **Institutions**: Connect with educational institutions
 - **Rich Content**: Support for various content types in lessons

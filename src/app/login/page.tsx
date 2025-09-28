@@ -2,7 +2,7 @@ import React from 'react';
 import LoginClient from './LoginClient';
 
 export const metadata = {
-  title: 'Login | NounLogic LMS',
+  title: 'Login | NounLogic',
   description: 'Sign in to your account',
 };
 

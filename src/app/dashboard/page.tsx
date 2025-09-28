@@ -2,8 +2,8 @@ import React from 'react';
 import DashboardClient from './DashboardClient';
 
 export const metadata = {
-  title: 'Dashboard | NounLogic LMS',
-  description: 'View your learning dashboard',
+  title: 'Dashboard | NounLogic',
+  description: 'View your social dashboard',
 };
 
 export default function DashboardPage() {

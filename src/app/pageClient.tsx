@@ -709,7 +709,7 @@ export default function HomeClient() {
           
           <div className="border-t border-slate-700/50 mt-8 pt-8 text-center">
             <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} NounLogic LMS. Powered by blockchain technology.
+              © {new Date().getFullYear()} NounLogic. Powered by blockchain technology.
             </p>
           </div>
         </div>

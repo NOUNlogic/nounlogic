@@ -984,7 +984,7 @@ export default function HomeClient() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="flex items-center space-x-4">
                 <p className="text-slate-500 text-sm">
-                  © {new Date().getFullYear()} NounLogic LMS. Powered by blockchain technology.
+                  © {new Date().getFullYear()} NounLogic. Powered by blockchain technology.
                 </p>
                 <motion.div
                   animate={{ rotate: 360 }}
