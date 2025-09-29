@@ -2,6 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { appwriteAccount, ID } from './client';
 import { usersService, analyticsService, FEATURE_FLAGS } from './services';
 import type { User as DatabaseUser } from '@/types/database';
