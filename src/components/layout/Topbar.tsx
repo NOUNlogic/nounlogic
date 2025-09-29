@@ -127,6 +127,24 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
           </button>
         )}
 
+        {/* Help / Chat FAB on mobile */}
+        <a
+          href="#" 
+          className="sm:hidden p-2 rounded-full bg-primary/10 text-primary"
+          onClick={(e) => {
+            e.preventDefault();
+            // Attempt to open Sensay widget if exposed globally
+            // @ts-ignore
+            if (typeof window !== 'undefined' && (window as any).SensayChatWidget?.open) {
+              // @ts-ignore
+              (window as any).SensayChatWidget.open();
+            }
+          }}
+          aria-label="Help"
+        >
+          <MessageSquare size={20} />
+        </a>
+
         {/* Notifications */}
         <button 
           className="relative p-2 rounded-lg hover:bg-secondary/80 transition-colors"

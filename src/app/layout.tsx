@@ -21,6 +21,7 @@ export default function RootLayout({
         <AppProviders>
           {children}
         </AppProviders>
+        <script src="https://chat-widget.sensay.io/3b1918af-8a5f-4088-b107-5aec870d9716/embed-script.js" defer />
       </body>
     </html>
   );
