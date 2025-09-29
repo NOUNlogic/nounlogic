@@ -3,9 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, BookOpen, Building, BarChart2,
-  Plug, Brain, Wallet, ChevronLeft, ChevronRight
+import {
+  Home,
+  MessageSquare,
+  Users,
+  UserPlus,
+  BookOpen,
+  Building,
+  Plug,
+  Brain,
+  Wallet,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -23,19 +32,22 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
     setActiveSection(currentSection || 'dashboard');
   }, [pathname]);
 
-  const mainNavItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Courses", href: "/courses", icon: BookOpen },
-    { name: "Institutions", href: "/institutions", icon: Building },
+  const socialNavItems = [
+    { name: "Feed", href: "/feed", icon: Home },
+    { name: "Messages", href: "/messages", icon: MessageSquare },
+    { name: "Groups", href: "/groups", icon: Users },
+    { name: "People", href: "/people", icon: UserPlus },
   ];
 
-  const secondaryNavItems = [
-    { name: "Integrations", href: "/integrations", icon: Plug },
+  const exploreNavItems = [
+    { name: "Courses", href: "/courses", icon: BookOpen },
+    { name: "Institutions", href: "/institutions", icon: Building },
   ];
 
   const techNavItems = [
     { name: "AI", href: "/ai", icon: Brain },
     { name: "Web3", href: "/web3", icon: Wallet },
+    { name: "Integrations", href: "/integrations", icon: Plug },
   ];
   
   const renderNavSection = (items: any[], sectionTitle?: string) => (
@@ -135,9 +147,9 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
         {/* Navigation sections */}
         <div className="py-6">
-          {renderNavSection(mainNavItems, "Main")}
+          {renderNavSection(socialNavItems, "Social")}
           {isOpen && <div className="mx-4 my-4 border-t border-slate-800/50"></div>}
-          {renderNavSection(secondaryNavItems, "Management")}
+          {renderNavSection(exploreNavItems, "Explore")}
           {isOpen && <div className="mx-4 my-4 border-t border-slate-800/50"></div>}
           {renderNavSection(techNavItems, "Advanced")}
         </div>

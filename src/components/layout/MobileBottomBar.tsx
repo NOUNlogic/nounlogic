@@ -3,23 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Building, 
-  Brain, 
-  Wallet 
-} from 'lucide-react';
+import { Home, MessageSquare, Users, UserPlus, BookOpen } from 'lucide-react';
 
 const MobileBottomBar: React.FC = () => {
   const pathname = usePathname();
 
   const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Courses", href: "/courses", icon: BookOpen },
-    { name: "Institutions", href: "/institutions", icon: Building },
-    { name: "AI", href: "/ai", icon: Brain },
-    { name: "Web3", href: "/web3", icon: Wallet },
+    { name: 'Feed', href: '/feed', icon: Home },
+    { name: 'Messages', href: '/messages', icon: MessageSquare },
+    { name: 'Groups', href: '/groups', icon: Users },
+    { name: 'People', href: '/people', icon: UserPlus },
+    { name: 'Courses', href: '/courses', icon: BookOpen },
   ];
 
   return (
