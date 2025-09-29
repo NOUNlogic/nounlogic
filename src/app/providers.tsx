@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import AuthModal from '@/components/auth/AuthModal';
 import { account, appwriteAuth } from '@/lib/appwrite';
 import { ThemeProvider } from '@/lib/theme';
 
@@ -106,15 +107,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// UI state for auth modal
+interface AuthUIContextType {
+  isAuthOpen: boolean;
+  openAuth: () => void;
+  closeAuth: () => void;
+}
+
+const AuthUIContext = createContext<AuthUIContextType | undefined>(undefined);
+
+export const useAuthUI = () => {
+  const ctx = useContext(AuthUIContext);
+  if (!ctx) throw new Error('useAuthUI must be used within AppProviders');
+  return ctx;
+};
+
 interface AppProvidersProps {
   children: ReactNode;
 }
 
 export default function AppProviders({ children }: AppProvidersProps) {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   return (
     <ThemeProvider defaultMode={"system" as any}>
       <AuthProvider>
-        {children}
+        <AuthUIContext.Provider value={{ isAuthOpen, openAuth: () => setIsAuthOpen(true), closeAuth: () => setIsAuthOpen(false) }}>
+          {children}
+          <AuthModal open={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+        </AuthUIContext.Provider>
       </AuthProvider>
     </ThemeProvider>
   );

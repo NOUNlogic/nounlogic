@@ -5,6 +5,7 @@ import { Menu, Search, Bell, User, LogOut, ChevronDown, Sun, Moon, MessageSquare
 import { account } from '@/lib/appwrite';
 import { useTheme } from '@/lib/theme';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import { useAuthUI } from '@/app/providers';
 
 interface TopbarProps {
   toggleSidebar: () => void;
@@ -15,6 +16,7 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
   const [loading, setLoading] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { isDark, setMode } = useTheme();
+  const { openAuth } = useAuthUI();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -180,8 +182,7 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
                 </div>
               ) : (
                 <>
-                  <a href="/login" className="block px-4 py-2 text-foreground hover:bg-primary/10 hover:text-primary transition-colors">Sign in</a>
-                  <a href="/register" className="block px-4 py-2 text-foreground hover:bg-primary/10 hover:text-primary transition-colors">Register</a>
+              <button onClick={openAuth} className="block w-full text-left px-4 py-2 text-foreground hover:bg-primary/10 hover:text-primary transition-colors">Sign in</button>
                   <a 
                     href="https://chat.whatsapp.com/IVyll17nbSv6Y8D8NCscIC" 
                     target="_blank" 
