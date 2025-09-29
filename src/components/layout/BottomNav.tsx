@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MessageSquare, Users, UserPlus, BookOpen, Building, Brain, Wallet } from 'lucide-react';
+import { Home, MessageSquare, Users, UserPlus } from 'lucide-react';
 
 const BottomNav = () => {
   const pathname = usePathname();
@@ -13,13 +13,12 @@ const BottomNav = () => {
     { name: 'Messages', href: '/messages', icon: MessageSquare },
     { name: 'Groups', href: '/groups', icon: Users },
     { name: 'People', href: '/people', icon: UserPlus },
-    { name: 'Courses', href: '/courses', icon: BookOpen },
   ];
 
   // Only show on mobile devices
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 h-16">
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-4 h-full">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (

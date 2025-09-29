@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MessageSquare, Users, UserPlus, BookOpen } from 'lucide-react';
+import { Home, MessageSquare, Users, UserPlus } from 'lucide-react';
 
 const MobileBottomBar: React.FC = () => {
   const pathname = usePathname();
@@ -13,7 +13,6 @@ const MobileBottomBar: React.FC = () => {
     { name: 'Messages', href: '/messages', icon: MessageSquare },
     { name: 'Groups', href: '/groups', icon: Users },
     { name: 'People', href: '/people', icon: UserPlus },
-    { name: 'Courses', href: '/courses', icon: BookOpen },
   ];
 
   return (

@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'NounLogic',
-  description: 'Social learning network to connect students and communities',
+  description: 'Connect with students worldwide — groups, messages, communities',
 };
 
 export default function RootLayout({

@@ -3,19 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  MessageSquare,
-  Users,
-  UserPlus,
-  BookOpen,
-  Building,
-  Plug,
-  Brain,
-  Wallet,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Home, MessageSquare, Users, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,16 +27,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
     { name: "People", href: "/people", icon: UserPlus },
   ];
 
-  const exploreNavItems = [
-    { name: "Courses", href: "/courses", icon: BookOpen },
-    { name: "Institutions", href: "/institutions", icon: Building },
-  ];
-
-  const techNavItems = [
-    { name: "AI", href: "/ai", icon: Brain },
-    { name: "Web3", href: "/web3", icon: Wallet },
-    { name: "Integrations", href: "/integrations", icon: Plug },
-  ];
+  // Hidden/secondary sections intentionally removed for social-first MVP
   
   const renderNavSection = (items: any[], sectionTitle?: string) => (
     <div className="mb-6">
@@ -148,10 +127,6 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         {/* Navigation sections */}
         <div className="py-6">
           {renderNavSection(socialNavItems, "Social")}
-          {isOpen && <div className="mx-4 my-4 border-t border-slate-800/50"></div>}
-          {renderNavSection(exploreNavItems, "Explore")}
-          {isOpen && <div className="mx-4 my-4 border-t border-slate-800/50"></div>}
-          {renderNavSection(techNavItems, "Advanced")}
         </div>
       </aside>
     </>

@@ -341,8 +341,8 @@ const LessonViewClient: React.FC<LessonViewClientProps> = ({ courseId, lessonId 
           </div>
         </div>
 
-        {/* Lesson content */}
-        <div className="flex-1 overflow-y-auto pb-20">
+        {/* Lesson content + Social sidebar */}
+        <div className="flex-1 overflow-y-auto pb-20 md:pr-4">
           <div className={`sticky top-0 z-20 border-b bg-background/80 backdrop-blur-md transition-all duration-300 ${
             isScrolled ? 'shadow-sm' : ''
           }`}>
@@ -593,6 +593,37 @@ const LessonViewClient: React.FC<LessonViewClientProps> = ({ courseId, lessonId 
             </div>
           </div>
         </div>
+
+        {/* Social Sidebar */}
+        <aside className="hidden md:block w-full md:w-80 lg:w-96 border-l border-border p-4 bg-background/40">
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Classmates online</h3>
+            <div className="mt-3 space-y-2">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/20" />
+                  <div className="text-sm">Student {i}</div>
+                  <span className="ml-auto w-2 h-2 rounded-full bg-green-500" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold text-muted-foreground">Discussion</h3>
+            <div className="mt-3 space-y-3">
+              {[1,2,3].map(i => (
+                <div key={i} className="p-3 rounded-lg border border-border">
+                  <div className="text-xs text-muted-foreground mb-1">Student {i}</div>
+                  <div className="text-sm">Question about this section — can someone explain consensus?</div>
+                </div>
+              ))}
+              <div className="flex gap-2 mt-2">
+                <input className="flex-1 px-3 py-2 rounded-lg bg-secondary/60 outline-none" placeholder="Write a comment"/>
+                <button className="px-3 py-2 rounded-lg bg-primary text-white">Post</button>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </MainLayout>
   );

@@ -70,7 +70,7 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
           <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
             NounLogic
           </h1>
-          <p className="text-sm text-muted-foreground">Social Learning Network</p>
+          <p className="text-sm text-muted-foreground">Connect with students worldwide</p>
         </div>
         
         {/* Mobile Logo */}
