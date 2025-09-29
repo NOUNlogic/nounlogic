@@ -1,6 +1,7 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export const metadata = {
   title: 'Feed | NounLogic',
@@ -8,6 +9,7 @@ export const metadata = {
 };
 
 export default function FeedPage() {
+  const [suggestion, setSuggestion] = useState<string | null>(null);
   return (
     <MainLayout>
       <div className="max-w-3xl mx-auto">
@@ -35,6 +37,20 @@ export default function FeedPage() {
                 </div>
               </div>
               <p className="text-sm text-slate-700 dark:text-slate-300">Just completed Lesson {i}! Who wants to review together?</p>
+              {/* Subtle AI suggestion link */}
+              {i === 1 && (
+                <button
+                  className="mt-2 text-xs text-primary hover:underline"
+                  onClick={() => setSuggestion('Maybe suggest forming a study group for blockchain basics?')}
+                >
+                  Ask AI for a reply suggestion
+                </button>
+              )}
+              {suggestion && (
+                <div className="mt-2 p-2 text-xs bg-primary/5 border border-primary/10 rounded">
+                  AI: {suggestion}
+                </div>
+              )}
               <div className="mt-3 flex gap-3 text-sm text-slate-600 dark:text-slate-400">
                 <button>Like</button>
                 <button>Comment</button>

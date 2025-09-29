@@ -376,6 +376,9 @@ const LessonViewClient: React.FC<LessonViewClientProps> = ({ courseId, lessonId 
                 <div className="prose max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-img:rounded-xl prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border">
                   <div dangerouslySetInnerHTML={{ __html: lessonContent.content }} />
                 </div>
+                <div className="mt-4">
+                  <button className="text-xs px-3 py-1.5 rounded bg-primary/10 text-primary" onClick={() => alert('AI would summarize this section...')}>Summarize with AI</button>
+                </div>
               </CardContent>
             </Card>
             

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 
 export const metadata = {
@@ -7,6 +7,8 @@ export const metadata = {
 };
 
 export default function MessagesPage() {
+  const [draft, setDraft] = useState('');
+  const [suggestion, setSuggestion] = useState<string | null>(null);
   return (
     <MainLayout>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -24,10 +26,25 @@ export default function MessagesPage() {
         <section className="md:col-span-2 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl min-h-[60vh] flex flex-col">
           <div className="flex-1" />
           <div className="mt-3 flex items-center gap-2">
-            <input className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 outline-none" placeholder="Type a message"/>
+            <input 
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 outline-none" 
+              placeholder="Type a message"
+            />
             <button className="px-4 py-2 rounded-lg bg-primary text-white">Send</button>
-            <a href="/ai" className="px-3 py-2 rounded-lg bg-primary/10 text-primary">Ask AI</a>
+            <button 
+              className="px-3 py-2 rounded-lg bg-primary/10 text-primary"
+              onClick={() => setSuggestion(`Reply suggestion: "${draft ? `Regarding: ${draft.slice(0, 30)}...` : 'Let’s schedule a time to chat.'}"`)}
+            >
+              Ask AI
+            </button>
           </div>
+          {suggestion && (
+            <div className="mt-2 p-2 text-xs bg-primary/5 border border-primary/10 rounded">
+              {suggestion}
+            </div>
+          )}
         </section>
       </div>
     </MainLayout>
