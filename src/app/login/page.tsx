@@ -1,17 +1,10 @@
-import React from 'react';
-import LoginClient from './LoginClient';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Login | NounLogic',
   description: 'Sign in to your account',
 };
 
-import { AuthProvider } from '@/app/providers';
-
 export default function LoginPage() {
-  return (
-    <AuthProvider>
-      <LoginClient />
-    </AuthProvider>
-  );
+  redirect('/feed');
 }

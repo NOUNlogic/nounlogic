@@ -117,6 +117,16 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
           <Bot size={18} /> Ask AI
         </a>
 
+        {/* Sign in button (when logged out) */}
+        {!user && !loading && (
+          <button 
+            onClick={openAuth}
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/80 hover:bg-secondary transition-colors"
+          >
+            Sign in
+          </button>
+        )}
+
         {/* Notifications */}
         <button 
           className="relative p-2 rounded-lg hover:bg-secondary/80 transition-colors"

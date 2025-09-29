@@ -32,6 +32,9 @@ const BottomNav = () => {
                   : 'text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary'
                 }
               `}
+              onClick={(e) => {
+                // In future, we can intercept to open auth modal if needed
+              }}
             >
               <item.icon 
                 size={22} 

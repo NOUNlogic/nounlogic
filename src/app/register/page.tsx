@@ -1,5 +1,5 @@
 import React from 'react';
-import RegisterClient from './RegisterClient';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Register | NounLogic',
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function RegisterPage() {
-  return <RegisterClient />;
+  redirect('/feed');
 }
