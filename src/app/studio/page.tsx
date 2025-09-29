@@ -1,7 +1,12 @@
 import StudioClient from './StudioClient';
+import { AppwriteAuthProvider } from '@/lib/appwrite/auth-context';
 
 const StudioPage = () => {
-  return <StudioClient />;
+  return (
+    <AppwriteAuthProvider>
+      <StudioClient />
+    </AppwriteAuthProvider>
+  );
 };
 
 export default StudioPage;
