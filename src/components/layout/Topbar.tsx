@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Menu, Search, Bell, User, LogOut, ChevronDown, Sun, Moon, MessageSquare } from 'lucide-react';
+import { Menu, Search, Bell, User, LogOut, ChevronDown, Sun, Moon, MessageSquare, Bot } from 'lucide-react';
 import { account } from '@/lib/appwrite';
 import { useTheme } from '@/lib/theme';
 import ThemeToggle from '@/components/ui/ThemeToggle';
@@ -106,6 +106,15 @@ const Topbar: React.FC<TopbarProps> = ({ toggleSidebar }) => {
         {/* Theme Toggle */}
         <ThemeToggle />
         
+        {/* AI Quick Compose */}
+        <a 
+          href="/ai" 
+          className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+          aria-label="Open AI Assistant"
+        >
+          <Bot size={18} /> Ask AI
+        </a>
+
         {/* Notifications */}
         <button 
           className="relative p-2 rounded-lg hover:bg-secondary/80 transition-colors"

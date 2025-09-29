@@ -1,10 +1,5 @@
-import SocialHomeClient from './socialHomeClient';
-import { AppwriteAuthProvider } from '@/lib/appwrite/auth-context-new';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <AppwriteAuthProvider>
-      <SocialHomeClient />
-    </AppwriteAuthProvider>
-  );
+  redirect('/feed');
 }

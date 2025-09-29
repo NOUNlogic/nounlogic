@@ -1,5 +1,6 @@
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Feed | NounLogic',
@@ -16,7 +17,10 @@ export default function FeedPage() {
             className="w-full bg-transparent outline-none placeholder:text-slate-400"
           />
           <div className="mt-3 flex justify-end">
-            <button className="px-4 py-2 rounded-lg bg-primary text-white">Post</button>
+            <div className="flex gap-2">
+              <Link href="/ai" className="px-3 py-2 rounded-lg bg-primary/10 text-primary">Ask AI</Link>
+              <button className="px-4 py-2 rounded-lg bg-primary text-white">Post</button>
+            </div>
           </div>
         </div>
 

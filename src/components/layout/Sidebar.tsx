@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MessageSquare, Users, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, MessageSquare, Users, UserPlus, Bot, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,6 +23,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const socialNavItems = [
     { name: "Feed", href: "/feed", icon: Home },
     { name: "Messages", href: "/messages", icon: MessageSquare },
+    { name: "AI Assistant", href: "/ai", icon: Bot },
     { name: "Groups", href: "/groups", icon: Users },
     { name: "People", href: "/people", icon: UserPlus },
   ];

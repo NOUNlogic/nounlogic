@@ -364,7 +364,10 @@ const LessonViewClient: React.FC<LessonViewClientProps> = ({ courseId, lessonId 
           
           <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-4xl mx-auto">
             <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-3">{lessonContent.title}</h1>
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-3">{lessonContent.title}</h1>
+                <a href="/ai" className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-md bg-primary/10 text-primary text-sm">Ask AI</a>
+              </div>
               <div className="h-1 w-20 bg-primary rounded-full mb-6 opacity-80"></div>
             </div>
             

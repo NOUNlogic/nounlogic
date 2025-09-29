@@ -26,6 +26,7 @@ export default function MessagesPage() {
           <div className="mt-3 flex items-center gap-2">
             <input className="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 outline-none" placeholder="Type a message"/>
             <button className="px-4 py-2 rounded-lg bg-primary text-white">Send</button>
+            <a href="/ai" className="px-3 py-2 rounded-lg bg-primary/10 text-primary">Ask AI</a>
           </div>
         </section>
       </div>
